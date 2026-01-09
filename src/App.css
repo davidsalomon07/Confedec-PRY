@@ -324,223 +324,167 @@ h3 { font-size: 2.5rem; color: var(--primary-purple); margin-bottom: 10px; text-
 .back-btn { background: none; border: none; margin-top: 10px; cursor: pointer; color: #666; text-decoration: underline; }
 .login-form input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
 
-/* ================= ESTILOS DEL PERFIL (DASHBOARD) ================= */
-.profile-container {
-  display: flex;
-  min-height: 100vh;
-  background-color: var(--bg-dark);
+/* VARIABLES */
+:root {
+  --nav-blue: #009fe3;
+  --active-blue: #003366;
+  --bg-black: #000000;
+  --input-bg: #111111;
+  --neon-green: #2ecc71;
+  --neon-red: #ff4d4d;
 }
 
-/* Sidebar (Izquierda) */
-.sidebar {
-  width: 250px;
-  background-color: #000;
-  border-right: 1px solid var(--primary-purple);
-  padding: 20px;
-  display: flex; flex-direction: column;
+/* EFECTO DE SALTO */
+.nav-tab-link:hover, 
+.logout-circle-btn:hover, 
+.update-data-btn:not(:disabled):hover, 
+.lock-toggle-btn:hover {
+  transform: translateY(-5px);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.sidebar-logo {
-  text-align: center; margin-bottom: 40px;
-}
-.sidebar-logo img { width: 60px; margin-bottom: 10px; }
-.sidebar-logo h3 { color: var(--text-white); letter-spacing: 2px; }
-
-.sidebar-menu { display: flex; flex-direction: column; gap: 10px; }
-
-.sidebar-menu button {
-  background: transparent; border: none;
-  color: #888; text-align: left; padding: 15px;
-  font-size: 1rem; cursor: pointer; border-radius: 10px;
-  transition: 0.3s;
-}
-
-.sidebar-menu button:hover, .sidebar-menu button.active {
-  background: rgba(123, 44, 191, 0.2);
-  color: var(--text-white);
-  border-left: 4px solid var(--primary-purple);
-}
-
-.logout-btn { margin-top: auto; color: #ff4d4d !important; }
-
-/* Contenido Principal (Derecha) */
-.profile-content {
-  flex: 1; padding: 40px;
-}
-
-.profile-header h2 { font-size: 2rem; margin-bottom: 5px; }
-.profile-header span { color: var(--neon-purple); }
-.profile-header p { color: #888; margin-bottom: 40px; }
-
-/* Tarjetas de Estadísticas */
-.stats-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px; margin-bottom: 40px;
-}
-
-.stat-card {
-  background: var(--bg-card);
-  padding: 30px; border-radius: 15px; border: 1px solid #333;
-  text-align: center;
-}
-.stat-card h3 { font-size: 1rem; color: #aaa; margin-bottom: 10px; }
-.stat-card .stat-number { font-size: 2.5rem; font-weight: bold; color: var(--text-white); }
-
-/* Sección Reciente */
-.recent-section { background: var(--bg-card); padding: 30px; border-radius: 15px; border: 1px solid #333; }
-.activity-box { margin-top: 20px; color: #ccc; }
-.activity-box hr { border: 0; border-top: 1px solid #333; margin: 15px 0; }
-
-/* Responsive Sidebar */
-@media (max-width: 768px) {
-  .profile-container { flex-direction: column; }
-  .sidebar { width: 100%; flex-direction: row; justify-content: space-between; align-items: center; padding: 10px; }
-  .sidebar-logo h3, .sidebar-menu button { display: none; } /* Ocultar textos en móvil simple */
-  .sidebar-logo img { width: 40px; margin: 0; }
-  .logout-btn { display: block; font-size: 0.8rem; }
-}
-/* =========================================
-   ESTILOS NUEVOS DEL PERFIL (Tipo Dashboard)
-   ========================================= */
-
-/* Contenedor Principal */
 .profile-wrapper {
-  background-color: black;
+  background-color: var(--bg-black);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   font-family: 'Segoe UI', sans-serif;
+  color: white;
 }
 
-/* --- NAVBAR SUPERIOR --- */
-.profile-navbar {
-  background-color: black;
-  height: 80px;
+/* NAVBAR */
+.profile-navbar-blue {
+  background-color: var(--nav-blue);
+  height: 110px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
-  border-bottom: 1px solid #333;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.nav-logo { height: 50px; }
+.navbar-left { display: flex; align-items: center; gap: 15px; }
+.nav-logo { height: 75px; }
+.nav-text-block { display: flex; flex-direction: column; justify-content: center; }
 
-/* Menú Central */
-.navbar-center { display: flex; gap: 30px; }
+.brand-title { 
+  color: black; 
+  font-size: 1.8rem; 
+  font-weight: 900; 
+  margin: 0; 
+  line-height: 1.1; 
+}
+.brand-subtitle { 
+  color: #222; 
+  font-size: 0.8rem; 
+  font-weight: 700; 
+  text-transform: uppercase; 
+  margin: 0; 
+}
 
-.nav-item {
-  color: white;
+/* TABS */
+.navbar-tabs-container { display: flex; gap: 10px; }
+.nav-tab-link {
   text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding-bottom: 5px;
+  color: black;
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.1);
   transition: 0.3s;
-  letter-spacing: 1px;
+}
+.nav-tab-link.active { background-color: var(--active-blue); color: white; }
+
+/* CONTENEDOR SALIDA (CIRCULO + TEXTO) */
+.navbar-right-logout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 
-/* EFECTO DE LUZ (Iluminar el activo) */
-.nav-item:hover { color: #00aaff; text-shadow: 0 0 10px #00aaff; }
-
-/* Esta clase se agrega sola gracias a NavLink */
-.nav-item.active {
-  color: #00aaff; /* Azul brillante */
-  border-bottom: 2px solid #00aaff;
-  text-shadow: 0 0 15px rgba(0, 170, 255, 0.8);
+.logout-circle-btn {
+  background: white; 
+  border: 2px solid var(--neon-red); 
+  color: var(--neon-red);
+  width: 45px !important;
+  height: 45px !important; 
+  border-radius: 50% !important;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  cursor: pointer; 
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  padding: 0;
 }
 
-/* Parte Derecha (Usuario) */
-.navbar-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-
-.user-badge {
-  background-color: #006400; /* Verde oscuro */
+.logout-circle-btn:hover {
+  background: var(--neon-red);
   color: white;
-  padding: 4px 15px;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 0.9rem;
-  text-transform: uppercase;
+  box-shadow: 0 0 12px var(--neon-red);
 }
 
-.logout-text-btn {
-  background: none; border: none;
-  color: white; font-size: 0.8rem;
-  cursor: pointer; text-decoration: underline;
+.logout-label {
+    color: black;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
 }
-.logout-text-btn:hover { color: #ff4d4d; }
 
+/* SEGURIDAD */
+.security-bar { background: #0a0a0a; padding: 12px 40px; display: flex; justify-content: flex-end; border-bottom: 1px solid #222; }
+.lock-toggle-btn { padding: 8px 20px; border-radius: 50px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 0.75rem; }
+.lock-toggle-btn.locked { background: var(--neon-red); color: white; }
+.lock-toggle-btn.unlocked { background: var(--neon-green); color: white; box-shadow: 0 0 15px var(--neon-green); }
 
-/* --- BANNER AZUL (Hero) --- */
-.profile-banner {
-  background: linear-gradient(to right, #004e92, #002244);
-  /* Si tienes la imagen del mapa, ponla aquí: */
-  /* background-image: url('/fondo-mapa.png'); */
-  padding: 40px 20px;
+/* HERO */
+.profile-hero-banner {
+  background: linear-gradient(135deg, #004e92, #001a33);
+  padding: 40px;
   text-align: center;
-  border-bottom: 4px solid #00aaff;
+  border-bottom: 4px solid var(--nav-blue);
+}
+.hero-logo-large { height: 70px; margin-bottom: 10px; }
+.hero-content h1 { font-size: 2.2rem; margin: 0; }
+.hero-content p { color: var(--nav-blue); font-weight: 600; }
+
+/* GRID DATOS */
+.profile-data-grid { padding: 40px 20px; flex: 1; }
+.data-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.section-label { color: #555; font-size: 0.75rem; font-weight: 900; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+.data-column label { color: var(--nav-blue); display: block; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; font-size: 0.8rem; }
+
+/* INPUTS */
+.data-input, .data-select, .data-textarea {
+  width: 100%; background: var(--input-bg); border: 1px solid #333; color: white;
+  padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; outline: none; transition: 0.3s;
+}
+.data-input:disabled, .data-select:disabled, .data-textarea:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* CAJA DE NIVEL */
+.educational-level-box { background: var(--active-blue); padding: 20px; border-radius: 15px; border: 2px solid var(--nav-blue); }
+.box-locked { opacity: 0.4; filter: grayscale(1); }
+.checkbox-grid { display: flex; flex-direction: column; gap: 10px; }
+.check-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; cursor: pointer; }
+
+/* BOTÓN ACTUALIZAR */
+.update-data-btn {
+  width: 100%; padding: 12px; background: var(--nav-blue); color: black; border: none;
+  border-radius: 8px; font-weight: 900; font-size: 0.95rem; margin-top: 20px; cursor: pointer; transition: 0.3s;
+}
+.update-data-btn:disabled { background: #222; color: #555; }
+
+/* WATERMARK */
+.watermark-text { text-align: right; font-size: 3rem; color: #0a0a0a; font-weight: 900; margin-top: 15px; letter-spacing: 4px; }
+
+/* FOOTER */
+.profile-footer { background: black; padding: 20px; text-align: center; font-size: 0.75rem; color: #444; border-top: 1px solid #111; }
+
+@media (max-width: 1100px) {
+  .profile-navbar-blue { flex-direction: column; height: auto; padding: 20px; gap: 20px; }
 }
 
-.banner-content img { height: 80px; margin-bottom: 10px; }
-.banner-content h1 { font-size: 3rem; margin: 0; text-shadow: 2px 2px 4px black; }
-.banner-content p { font-size: 1.2rem; color: #ddd; }
-
-
-/* --- SECCIÓN DE DATOS (3 Columnas) --- */
-.data-section {
-  padding: 50px 20px;
-  flex: 1; /* Ocupa el resto de la pantalla */
-}
-
-.data-container {
-  max-width: 1200px; margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr; /* 3 columnas iguales */
-  gap: 40px;
-}
-
-.data-column { display: flex; flex-direction: column; gap: 20px; position: relative; }
-
-.data-column label {
-  color: white; font-weight: bold; font-size: 1.1rem; margin-bottom: -10px;
-}
-
-/* Las "píldoras" azules */
-.data-pill {
-  background-color: #003366; /* Azul oscuro institucional */
-  color: #ccc; /* Texto grisáceo/blanco */
-  padding: 12px 20px;
-  border-radius: 25px; /* Bordes redondos */
-  font-size: 1rem;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5); /* Sombra interna para profundidad */
-}
-
-/* Caja de lista (Nivel educativo) */
-.level-box {
-  background-color: #003366; /* Mismo azul oscuro */
-  border-radius: 20px;
-  padding: 20px;
-  color: white;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-}
-.level-box ul { list-style: none; padding: 0; }
-.level-box li { margin-bottom: 8px; font-size: 0.95rem; }
-
-/* Texto "PERFIL" en la esquina */
-.section-title-corner {
-  text-align: right; margin-top: 20px;
-  font-size: 2.5rem; color: #555; font-weight: 800;
-  text-transform: uppercase;
-}
-
-/* --- FOOTER --- */
-.profile-footer {
-  background: linear-gradient(to right, #003366, #001122);
-  text-align: center; padding: 15px; color: white; border-top: 1px solid #444;
-}
-
-/* RESPONSIVE (Celular) */
-@media (max-width: 900px) {
-  .data-container { grid-template-columns: 1fr; /* Una columna en pantallas chicas */ }
-  .profile-navbar { flex-direction: column; height: auto; padding: 20px; gap: 20px; }
-  .navbar-center { flex-wrap: wrap; justify-content: center; }
-  .navbar-right { align-items: center; }
-}

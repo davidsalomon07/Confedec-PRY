@@ -135,7 +135,6 @@ function App() {
           <div className="location-grid">
             <div className="location-info">
               <div className="info-item">
-                <span className="icon">📍</span>
                 <div>
                   <h4>Dirección</h4>
                   <p>Calle Andalucía N24-63 y Madrid</p>
@@ -144,7 +143,6 @@ function App() {
               </div>
               
               <div className="info-item">
-                <span className="icon">📞</span>
                 <div>
                   <h4>Teléfono</h4>
                   <p>(02) 222-1986</p>
@@ -152,14 +150,13 @@ function App() {
               </div>
 
               <div className="info-item">
-                <span className="icon">✉️</span>
                 <div>
                   <h4>Email</h4>
                   <p>confedec.comunicaciones@confedec.org</p>
                 </div>
               </div>
               
-              <button className="map-btn-link" onClick={() => window.open('https://goo.gl/maps/tu-enlace-aqui', '_blank')}>
+              <button className="map-btn-link" onClick={() => window.open('https://www.google.com/maps/place/CONFEDEC/@-0.2075885,-78.4884672,17z/data=!3m1!4b1!4m6!3m5!1s0x91d59a05dd7c38af:0x80d5cd75fc27cbf!8m2!3d-0.2075939!4d-78.4858923!16s%2Fg%2F11cks2mkf6?entry=ttu&g_ep=EgoyMDI2MDEwNy4wIKXMDSoASAFQAw%3D%3D', '_blank')}>
                 Abrir en Google Maps ↗
               </button>
             </div>
