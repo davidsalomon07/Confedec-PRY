@@ -1,10 +1,26 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './App.css'
 
 function App() {
-  // Estados para controlar si el Login y el Menú están abiertos o cerrados
   const [showLogin, setShowLogin] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
+  const navigate = useNavigate();
+
+  // 1. Función para el Scroll Suave (Faltaba esto)
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // 2. Función del Login
+  const handleLogin = (e) => {
+    e.preventDefault(); 
+    // Aquí iría la validación real. Por ahora redirige al perfil:
+    setShowLogin(false); // Cerramos el modal
+    navigate('/perfil');
+  };
 
   return (
     <div className="app-container">
@@ -15,122 +31,182 @@ function App() {
           <img src="/confedec.png" alt="Logo Confedec" className="header-logo" />
           <div className="brand-text">
             <h1>CONFEDEC</h1>
-            <p>REGISTRO DE INFORMACION</p>
+            <p>REGISTRO DE INFORMACIÓN</p>
           </div>
         </div>
 
-        {/* --- NAVEGACIÓN NUEVA --- */}
-        <nav className="nav-menu">
-          
-          {/* 1. Botón de LOGIN */}
+        {/* --- NAVEGACIÓN Y LOGIN --- */}
+        <div className="header-right">
+          <nav className="nav-tabs">
+            <button onClick={() => scrollToSection('informacion')}>INFORMACIÓN</button>
+            <button onClick={() => scrollToSection('directivo')}>DIRECTIVO</button>
+            <button onClick={() => scrollToSection('ubicacion')}>UBICACIÓN</button>
+          </nav>
+
           <button 
-            className="nav-btn login-btn" 
+            className="login-btn-flashy" 
             onClick={() => setShowLogin(true)}
           >
             INICIO SESIÓN
           </button>
-
-          {/* 2. Menú Desplegable (Dropdown) */}
-          <div className="dropdown-container">
-            <button 
-              className="nav-btn menu-btn" 
-              onClick={() => setShowMenu(!showMenu)}
-            >
-              MENÚ OPCIONES ▼
-            </button>
-
-            {/* Lista que aparece/desaparece */}
-            {showMenu && (
-              <div className="dropdown-content">
-                <a href="#info">INFORMACIÓN</a>
-                <a href="#ubicacion">UBICACIÓN</a>
-                <a href="#directivo">DIRECTIVO</a>
-                <a href="#estudiantes">ESTUDIANTES</a>
-                <a href="#paralelos">PARALELOS</a>
-                <a href="#personal">PERSONAL</a>
-              </div>
-            )}
-          </div>
-        </nav>
-      </header>
-
-      {/* --- VENTANA MODAL DE LOGIN (DISEÑO FINAL) --- */}
-      {showLogin && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            
-            {/* Cabecera del Login con Logo */}
-            <div className="login-header">
-              <div className="login-logo-circle">
-                <img src="/confedec.png" alt="Logo" />
-              </div>
-              <h2>Bienvenido</h2>
-              <p>Ingresa tus credenciales</p>
-            </div>
-
-            {/* Formulario */}
-            <form className="login-form">
-              <div className="input-group">
-                <label>Código AMIE</label>
-                <input type="text" placeholder="Ej: 17H00000" />
-              </div>
-
-              <div className="input-group">
-                <label>Contraseña</label>
-                <input type="password" placeholder="••••••••" />
-              </div>
-
-              <div className="options-row">
-                <label className="checkbox-container">
-                  <input type="checkbox" /> Recordarme
-                </label>
-                <a href="#" className="forgot-pass">¿Olvidaste tu contraseña?</a>
-              </div>
-
-              <button type="submit" className="confirm-btn">INGRESAR</button>
-            </form>
-
-            {/* Botón de Regresar */}
-            <button className="back-btn" onClick={() => setShowLogin(false)}>
-              ← Regresar a Registro de información
-            </button>
-
-          </div>
         </div>
-      )}
+      </header>
 
       {/* --- HERO SECTION --- */}
       <section className="hero-section">
         <div className="hero-overlay">
-          {/* NOTA: Si tu imagen ya tiene texto, deja este div vacío */}
           <div className="hero-content">
             <h1>CONFEDEC</h1>
             <h2>Confederación Ecuatoriana de Establecimientos de Educación Católica</h2>
+            
+            <button 
+              className="explore-btn" 
+              onClick={() => scrollToSection('informacion')}
+            >
+              CONOCER MÁS ↓
+            </button>
           </div>
         </div>
       </section>
 
-      {/* --- INFO SECTION --- */}
-      <section className="info-section">
-        <div className="info-container">
-          <div className="info-left">
-            <h3>¿Qué es la CONFEDEC?</h3>
-            <div className="circle-logo-container">
-               <img src="/confedec.png" alt="Logo Circular" />
+      {/* --- SECCIÓN 1: INFORMACIÓN --- */}
+      <section id="informacion" className="section-content info-section">
+        <div className="container">
+          <div className="info-grid">
+            <div className="info-text">
+              <h3>¿Quiénes Somos?</h3>
+              <p>
+                La Confederación Ecuatoriana de Establecimientos de Educación Católica es una institución de derecho privado, con finalidad de servicio social y sin fines de lucro. Integramos a 22 Federaciones Provinciales y buscamos la excelencia en la educación basada en valores.
+              </p>
+            </div>
+            <div className="info-image">
+               <div className="circle-logo-container">
+                  <img src="/confedec.png" alt="Logo" />
+               </div>
             </div>
           </div>
-          <div className="info-right">
-            <p>
-              La Confederación Ecuatoriana de Establecimientos de Educación Católica, es una institución de derecho privado, con finalidad de servicio social y sin fines de lucro, está integrada por 22 Federaciones Provinciales.
+        </div>
+      </section>
+
+      {/* --- SECCIÓN 2: DIRECTIVO --- */}
+      <section id="directivo" className="section-content directivo-section">
+        <div className="container">
+          <div className="directivo-header">
+            <h3>Autoridades Institucionales</h3>
+            <p className="directivo-intro">
+              Conozca a quienes encabezan nuestra estructura organizacional.
             </p>
+          </div>
+
+          <div className="directivo-layout">
+            <p className="directivo-text-main">
+              Este apartado está dedicado a nuestro equipo de liderazgo, 
+              <span className="highlight-text"> pilares fundamentales de nuestra gestión.</span>
+            </p>
+
+            <div className="roles-minimal-grid">
+              <div className="role-item">
+                <span className="role-line"></span>
+                <h4>Dirección General</h4>
+              </div>
+              <div className="role-item">
+                <span className="role-line"></span>
+                <h4>Rectorado</h4>
+              </div>
+              <div className="role-item">
+                <span className="role-line"></span>
+                <h4>Vicerrectorado</h4>
+              </div>
+              <div className="role-item">
+                <span className="role-line"></span>
+                <h4>Secretaría</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- SECCIÓN 3: UBICACIÓN --- */}
+      <section id="ubicacion" className="section-content ubicacion-section">
+        <div className="container">
+          <h3>Nuestra Ubicación</h3>
+          <p className="subtitle">Visítanos en nuestra sede central</p>
+          
+          <div className="location-grid">
+            <div className="location-info">
+              <div className="info-item">
+                <span className="icon">📍</span>
+                <div>
+                  <h4>Dirección</h4>
+                  <p>Calle Andalucía N24-63 y Madrid</p>
+                  <p>Sector La Floresta, Quito - Ecuador</p>
+                </div>
+              </div>
+              
+              <div className="info-item">
+                <span className="icon">📞</span>
+                <div>
+                  <h4>Teléfono</h4>
+                  <p>(02) 222-1986</p>
+                </div>
+              </div>
+
+              <div className="info-item">
+                <span className="icon">✉️</span>
+                <div>
+                  <h4>Email</h4>
+                  <p>confedec.comunicaciones@confedec.org</p>
+                </div>
+              </div>
+              
+              <button className="map-btn-link" onClick={() => window.open('https://goo.gl/maps/tu-enlace-aqui', '_blank')}>
+                Abrir en Google Maps ↗
+              </button>
+            </div>
+
+            <div className="map-container">
+              <iframe 
+                title="Mapa Confedec"
+                width="100%" 
+                height="100%" 
+                frameBorder="0" 
+                scrolling="no" 
+                marginHeight="0" 
+                marginWidth="0" 
+                src="https://maps.google.com/maps?q=Calle+Andalucia+N24-63+y+Madrid+Quito&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                allowFullScreen
+              >
+              </iframe>
+            </div>
           </div>
         </div>
       </section>
 
       {/* --- FOOTER --- */}
       <footer className="main-footer">
-        <p>Contacto - redes sociales</p>
+        <p>© 2026 CONFEDEC - Todos los derechos reservados</p>
+        <div className="social-links">Facebook | Instagram | Twitter</div>
       </footer>
+
+      {/* --- MODAL LOGIN CORREGIDO --- */}
+      {showLogin && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <div className="login-logo-circle"><img src="/confedec.png" alt="Logo" /></div>
+            <h2>Bienvenido</h2>
+            <p>Plataforma de Gestión</p>
+            
+            {/* Formulario limpio y conectado */}
+            <form className="login-form" onSubmit={handleLogin}>
+              <input type="text" placeholder="Usuario / Código AMIE" required />
+              <input type="password" placeholder="Contraseña" required />
+              <button type="submit" className="confirm-btn">ACCEDER</button>
+            </form>
+            
+            <button className="back-btn" onClick={() => setShowLogin(false)}>Cerrar</button>
+          </div>
+        </div>
+      )}
 
     </div>
   )
