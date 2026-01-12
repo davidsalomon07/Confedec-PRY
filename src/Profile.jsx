@@ -16,6 +16,10 @@ function Profile() {
   // ESTADOS PARA LOS CAMPOS EDITABLES
   const [distrito, setDistrito] = useState("Zona 9 - Distrito 17D05");
   const [historia, setHistoria] = useState("La institución fue fundada con la misión de brindar educación católica de alta calidad, basada en los valores de San Vicente de Paúl, sirviendo a la comunidad desde 1980...");
+  
+  // NUEVOS ESTADOS PARA OBRA SOCIAL
+  const [tipoObraSocial, setTipoObraSocial] = useState("Educativa - Social");
+  const [descripcionObra, setDescripcionObra] = useState("Detalle aquí las actividades y el alcance de la obra social que realiza la institución...");
 
   const handleLogout = () => navigate('/');
   const toggleLock = () => setIsLocked(!isLocked);
@@ -81,6 +85,7 @@ function Profile() {
       <main className="profile-data-grid">
         <div className="data-container">
           
+          {/* COLUMNA 1 */}
           <div className="data-column">
             <div className="section-label">CONFIGURACIÓN BÁSICA</div>
             
@@ -111,8 +116,9 @@ function Profile() {
             />
           </div>
 
+          {/* COLUMNA 2: HISTORIA Y OBRA SOCIAL */}
           <div className="data-column">
-            <div className="section-label">RESEÑA Y FECHAS</div>
+            <div className="section-label">RESEÑA Y OBRA SOCIAL</div>
 
             <label>Fecha de Creación</label>
             <input type="date" className="data-input" disabled={isLocked} defaultValue="1980-05-24" />
@@ -123,10 +129,30 @@ function Profile() {
               value={historia}
               onChange={(e) => setHistoria(e.target.value)}
               disabled={isLocked}
-              rows="8"
+              rows="4"
+            />
+
+            <label>Tipo de Obra Social</label>
+            <input 
+              type="text" 
+              className="data-input" 
+              value={tipoObraSocial} 
+              onChange={(e) => setTipoObraSocial(e.target.value)}
+              disabled={isLocked}
+              placeholder="Ej: Educativa, Asistencial, etc."
+            />
+
+            <label>Descripción de la Obra Social</label>
+            <textarea 
+              className="data-textarea" 
+              value={descripcionObra}
+              onChange={(e) => setDescripcionObra(e.target.value)}
+              disabled={isLocked}
+              rows="5"
             />
           </div>
 
+          {/* COLUMNA 3 */}
           <div className="data-column">
             <div className="section-label">OFERTA ACADÉMICA</div>
             

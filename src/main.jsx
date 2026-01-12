@@ -1,17 +1,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom' // <--- Esto es vital
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.jsx'
 import Profile from './Profile.jsx'
-import './index.css' // O './App.css' si usas ese para los estilos globales
+import Ubicacion from './Ubicacion.jsx' // <--- 1. Importa el nuevo archivo
+import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {/* AQUÍ está la solución: BrowserRouter envuelve a todo */}
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/perfil" element={<Profile />} />
+        <Route path="/ubicacion" element={<Ubicacion />} /> {/* <--- 2. Añade esta ruta */}
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
