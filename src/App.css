@@ -352,51 +352,80 @@ h3 { font-size: 2.5rem; color: var(--primary-purple); margin-bottom: 10px; text-
   color: white;
 }
 
-/* NAVBAR */
 .profile-navbar-blue {
-  background-color: var(--nav-blue);
-  height: 110px;
+  /* Cambio clave: De Azul a Negro/Gris muy oscuro */
+  background-color: #080808; 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 40px;
+  padding: 15px 40px;
+  color: white;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5); /* Sombra más dramática */
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 100;
+  border-bottom: 1px solid #333; /* Borde sutil inferior */
 }
 
 .navbar-left { display: flex; align-items: center; gap: 15px; }
 .nav-logo { height: 75px; }
 .nav-text-block { display: flex; flex-direction: column; justify-content: center; }
 
-.brand-title { 
-  color: black; 
-  font-size: 1.8rem; 
-  font-weight: 900; 
-  margin: 0; 
-  line-height: 1.1; 
+/* Logo y Textos del Header */
+.brand-title {
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin: 0;
 }
-.brand-subtitle { 
-  color: #222; 
-  font-size: 0.8rem; 
-  font-weight: 700; 
-  text-transform: uppercase; 
-  margin: 0; 
+
+.brand-subtitle {
+  color: #a0a0a0; /* Gris claro en lugar de blanco */
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  margin: 0;
 }
 
 /* TABS */
 .navbar-tabs-container { display: flex; gap: 10px; }
+/* --- NUEVOS BOTONES DE NAVEGACIÓN (Estilo Subrayado) --- */
 .nav-tab-link {
+  color: #a0a0a0; /* Texto gris cuando no está activo */
   text-decoration: none;
-  color: black;
-  font-weight: 800;
-  font-size: 0.75rem;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid rgba(0,0,0,0.1);
-  transition: 0.3s;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 10px 5px; /* Menos padding lateral, más vertical */
+  margin: 0 15px;
+  transition: all 0.3s ease;
+  background: transparent; /* Quitamos el fondo azul anterior */
+  border-radius: 0; /* Ya no son redondos */
+  position: relative;
 }
-.nav-tab-link.active { background-color: var(--active-blue); color: white; }
+
+.nav-tab-link:hover {
+  color: #ffffff;
+  background: transparent;
+}
+/* EL EFECTO PÚRPURA DE TU REFERENCIA */
+.nav-tab-link.active {
+  color: #ffffff; /* Blanco brillante */
+  background: transparent; /* Sin fondo */
+  /* Aquí está la magia: la línea violeta abajo */
+  box-shadow: 0 3px 0 0 #6d28d9; /* Violeta intenso (#6d28d9) */
+}
+
+/* Pequeño brillo morado al activo */
+.nav-tab-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -16px; /* Ajustar según altura */
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  box-shadow: 0 -5px 15px rgba(109, 40, 217, 0.6);
+}
 
 /* CONTENEDOR SALIDA (CIRCULO + TEXTO) */
 .navbar-right-logout {
@@ -404,6 +433,52 @@ h3 { font-size: 2.5rem; color: var(--primary-purple); margin-bottom: 10px; text-
     flex-direction: column;
     align-items: center;
     gap: 4px;
+}
+
+/* --- NUEVOS BOTONES COLOR PÚRPURA --- */
+
+/* El botón de "Desbloquear Edición" */
+.lock-toggle-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); /* Violeta */
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  transition: transform 0.2s;
+}
+
+.lock-toggle-btn.locked {
+  background: #333; /* Gris oscuro si está bloqueado */
+  box-shadow: none;
+}
+
+/* El botón grande de "Guardar" al final */
+.update-data-btn {
+  background-color: #6d28d9; /* Violeta solido */
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s;
+  width: 100%; /* Opcional si quieres que ocupe todo el ancho */
+}
+
+.update-data-btn:hover {
+  background-color: #5b21b6; /* Violeta más oscuro al pasar mouse */
+}
+
+.clean-card-title {
+  color: #4c1d95; /* Violeta muy oscuro y elegante */
+  /* O si prefieres negro puro: color: #111; */
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 15px;
 }
 
 .logout-circle-btn {
@@ -429,10 +504,12 @@ h3 { font-size: 2.5rem; color: var(--primary-purple); margin-bottom: 10px; text-
 }
 
 .logout-label {
-    color: black;
-    font-size: 0.65rem;
-    font-weight: 800;
-    text-transform: uppercase;
+  color: #ffffff; /* <--- AQUÍ ESTÁ EL TRUCO (Antes estaba black) */
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-top: 5px; /* Un poquito de espacio para que no se pegue al botón */
+  letter-spacing: 1px;
 }
 
 /* SEGURIDAD */
@@ -544,4 +621,245 @@ h3 { font-size: 2.5rem; color: var(--primary-purple); margin-bottom: 10px; text-
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
+}
+
+/* ================= PALETA OFICIAL CONFEDEC (Dark & Purple) ================= */
+:root {
+  --bg-dark: #0a0a0a;         /* Negro de fondo */
+  --confedec-purple: #662483; /* Morado oficial */
+  --confedec-purple-light: #8e44ad;
+  --text-gray: #b0b0b0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--bg-dark); /* Fondo de la web: NEGRO */
+  color: #e0e0e0;
+  font-family: 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ========================================================== */
+/* 1. HEADER (CONFEDEC STYLE - NEGRO Y MORADO)               */
+/* ========================================================== */
+
+.profile-navbar-blue {
+  background-color: #000000 !important; /* Forzamos Negro Puro */
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 3px solid var(--confedec-purple); /* Línea morada clave */
+  box-shadow: 0 4px 20px rgba(102, 36, 131, 0.2);
+}
+
+.navbar-left { display: flex; align-items: center; gap: 15px; }
+.nav-logo { height: 60px; }
+.nav-text-block { display: flex; flex-direction: column; justify-content: center; }
+
+.brand-title { 
+  color: #ffffff; 
+  font-size: 1.6rem; 
+  font-weight: 800; 
+  margin: 0; 
+  line-height: 1.1; 
+}
+.brand-subtitle { 
+  color: var(--confedec-purple-light); 
+  font-size: 0.75rem; 
+  font-weight: 600; 
+  text-transform: uppercase; 
+  margin: 0; 
+  letter-spacing: 1px;
+}
+
+/* TABS DEL MENÚ */
+.navbar-tabs-container { display: flex; gap: 5px; }
+
+.nav-tab-link {
+  text-decoration: none;
+  color: #888; /* Gris cuando no está activo */
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 10px 15px;
+  background: transparent;
+  transition: 0.3s;
+  position: relative;
+  border-radius: 0; /* Cuadrado */
+}
+
+.nav-tab-link:hover { color: #fff; }
+
+/* ESTADO ACTIVO (La línea morada debajo del texto) */
+.nav-tab-link.active { 
+  color: #ffffff; 
+  background: transparent;
+  box-shadow: 0 4px 0 -1px var(--confedec-purple); /* Subrayado */
+}
+
+/* BOTÓN CERRAR SESIÓN */
+.navbar-right-logout { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+.logout-circle-btn {
+  background: transparent; 
+  border: 2px solid var(--confedec-purple); 
+  color: var(--confedec-purple-light);
+  width: 40px; height: 40px; 
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; 
+  transition: all 0.3s ease;
+}
+.logout-circle-btn:hover {
+  background: var(--confedec-purple);
+  color: white;
+  box-shadow: 0 0 15px var(--confedec-purple);
+}
+
+.logout-label { 
+  color: #ffffff; /* BLANCO para que se vea en fondo negro */
+  font-size: 0.6rem; 
+  font-weight: 800; 
+  text-transform: uppercase; 
+}
+
+/* ========================================================== */
+/* 2. BARRA DE SEGURIDAD Y HERO                              */
+/* ========================================================== */
+
+.security-bar { 
+  background: #111; 
+  padding: 10px 40px; 
+  display: flex; justify-content: flex-end; 
+  border-bottom: 1px solid #222; 
+}
+
+.lock-toggle-btn { 
+  padding: 8px 25px; 
+  border-radius: 50px; 
+  font-weight: 700; border: none; cursor: pointer; transition: 0.3s; 
+  font-size: 0.8rem; 
+}
+.lock-toggle-btn.locked { background: #333; color: #ccc; } /* Gris apagado */
+.lock-toggle-btn.unlocked { background: var(--confedec-purple); color: white; box-shadow: 0 0 10px var(--confedec-purple); }
+
+.profile-hero-banner {
+  background: linear-gradient(to right, #000, #1a1a1a); /* Negro degradado */
+  padding: 50px;
+  text-align: center;
+  border-bottom: 1px solid #333;
+}
+.hero-content h1 { font-size: 2.2rem; margin: 0; color: white; }
+.hero-content p { color: var(--confedec-purple-light); font-weight: 600; margin-top: 5px; }
+.hero-logo-large { height: 70px; margin-bottom: 15px; }
+
+
+/* ========================================================== */
+/* 3. ESTILOS DE "TARJETAS BLANCAS" (Clean Layout)           */
+/* ¡Aquí es donde arreglamos el problema visual!          */
+/* ========================================================== */
+
+.profile-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* AQUÍ ESTÁ EL CAMBIO DE TAMAÑO */
+.clean-layout-container {
+  max-width: 800px; /* AUMENTADO: Antes 900px -> Ahora 1400px */
+  width: 95%;        /* Ocupa el 95% del ancho de la pantalla */
+  margin: 40px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;         /* Más separación vertical entre tarjeta y tarjeta */
+}
+
+/* LA TARJETA BLANCA (Fondo Blanco Obligatorio) */
+.clean-card-box {
+  background-color: #ffffff !important; /* BLANCO FORZADO */
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Sombra suave */
+}
+
+/* TÍTULOS DENTRO DE LA TARJETA */
+.clean-card-title {
+  color: var(--confedec-purple); /* Título Morado */
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* GRUPO DE INPUTS */
+.clean-input-group { display: flex; flex-direction: column; gap: 8px; }
+
+.clean-input-group label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #333333; /* Texto oscuro para contraste con fondo blanco */
+  margin-left: 2px;
+}
+
+/* LOS CAMPOS DE TEXTO */
+.clean-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #000; /* Texto Negro */
+  background-color: #fff; /* Fondo Blanco */
+  transition: border-color 0.2s;
+}
+
+.clean-input:focus {
+  outline: none;
+  border-color: var(--confedec-purple);
+  box-shadow: 0 0 0 4px rgba(102, 36, 131, 0.1);
+}
+
+/* INPUT BLOQUEADO (CANDADO CERRADO) */
+.clean-input:disabled {
+  background-color: #f4f4f4; /* Gris muy clarito */
+  color: #555; /* Texto gris oscuro */
+  border-color: #ddd;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* BOTÓN GUARDAR GRANDE */
+.update-data-btn {
+  width: 100%; padding: 15px; 
+  background: var(--confedec-purple); 
+  color: white; border: none;
+  border-radius: 6px; 
+  font-weight: 700; font-size: 1rem; 
+  margin-top: 20px; cursor: pointer; transition: 0.3s;
+}
+.update-data-btn:hover { background-color: #4b1a61; transform: translateY(-2px); }
+.update-data-btn:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
+
+/* FOOTER */
+.profile-footer { 
+  background: #000; 
+  padding: 30px; 
+  text-align: center; 
+  font-size: 0.8rem; 
+  color: #666; 
+  border-top: 1px solid #222; 
+  margin-top: auto; /* Empuja el footer al fondo */
 }
