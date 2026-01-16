@@ -6,6 +6,9 @@ import Profile from './Profile.jsx'
 import Ubicacion from './Ubicacion.jsx' // <--- 1. Importa el nuevo archivo
 import Informacion from './Informacion.jsx'
 import Directivo from './Directivos.jsx'
+import Estudiantes from './Estudiantes';
+import Paralelos from './Paralelos';
+
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -17,6 +20,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/ubicacion" element={<Ubicacion />} /> {/* <--- 2. Añade esta ruta */}
         <Route path="/informacion" element={<Informacion />} />
         <Route path="/directivo" element={<Directivo />} />
+        <Route path="/estudiantes" element={<Estudiantes />} />
+        <Route path="/paralelos" element={<Paralelos />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
