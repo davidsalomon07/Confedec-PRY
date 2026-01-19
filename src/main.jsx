@@ -6,6 +6,7 @@ import Profile from './Profile.jsx'
 import Ubicacion from './Ubicacion.jsx' // <--- 1. Importa el nuevo archivo
 import Informacion from './Informacion.jsx'
 import Directivo from './Directivos.jsx'
+import Personal from './Personal.jsx';
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/ubicacion" element={<Ubicacion />} /> {/* <--- 2. Añade esta ruta */}
         <Route path="/informacion" element={<Informacion />} />
         <Route path="/directivo" element={<Directivo />} />
+        <Route path="/personal" element={<Personal />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

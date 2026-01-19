@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './App.css'
+import Personal from './Personal';
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -24,7 +25,7 @@ function App() {
 
   return (
     <div className="app-container">
-      
+
       {/* --- HEADER --- */}
       <header className="main-header">
         <div className="header-left">
@@ -41,6 +42,7 @@ function App() {
             <button onClick={() => scrollToSection('informacion')}>INFORMACIÓN</button>
             <button onClick={() => scrollToSection('directivo')}>DIRECTIVO</button>
             <button onClick={() => scrollToSection('ubicacion')}>UBICACIÓN</button>
+            <button onClick={() => scrollToSection('personal')}>PERSONAL</button>
           </nav>
 
           <button 
@@ -178,6 +180,45 @@ function App() {
           </div>
         </div>
       </section>
+
+      {/* --- SECCIÓN 4: PERSONAL --- */}
+<section id="personal" className="section-content personal-section">
+  <div className="container">
+    <div className="personal-header">
+      <h3>Personal Institucional</h3>
+      <p className="personal-intro">
+        Conozca las diferentes categorías de personal que forman parte de nuestra comunidad educativa.
+      </p>
+    </div>
+
+    <div className="personal-grid">
+      <div className="personal-item">
+        <span className="personal-line"></span>
+        <h4>Docentes Particulares</h4>
+      </div>
+      <div className="personal-item">
+        <span className="personal-line"></span>
+        <h4>Administrativos Particulares</h4>
+      </div>
+      <div className="personal-item">
+        <span className="personal-line"></span>
+        <h4>Mantenimiento / Servicio</h4>
+      </div>
+      <div className="personal-item">
+        <span className="personal-line"></span>
+        <h4>Docentes Fiscales</h4>
+      </div>
+      <div className="personal-item">
+        <span className="personal-line"></span>
+        <h4>Administrativos Fiscales</h4>
+      </div>
+    </div>
+
+    <div className="personal-footer">
+      <a href="#">Contacto - redes sociales</a>
+    </div>
+  </div>
+</section>
 
       {/* --- FOOTER --- */}
       <footer className="main-footer">

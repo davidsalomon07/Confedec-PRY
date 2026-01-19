@@ -1,0 +1,60 @@
+.personal-section {
+  background-color: #121212; /* negro institucional */
+  color: #e0e0e0;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.personal-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.personal-header h3 {
+  font-size: 2rem;
+  color: #b8b8ff; /* Tono institucional claro */
+}
+
+.personal-intro {
+  font-size: 1rem;
+  color: #cccccc;
+}
+
+.personal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.personal-item {
+  background-color: #2a2a3d;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.personal-item h4 {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  color: #e0e0ff;
+}
+
+.personal-line {
+  display: block;
+  height: 2px;
+  background-color: #7f7fff;
+  margin-bottom: 0.5rem;
+}
+
+.personal-footer {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.personal-footer a {
+  color: #7f7fff;
+  text-decoration: none;
+  font-weight: bold;
+}
