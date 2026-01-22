@@ -1063,3 +1063,16 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Grillas para el formulario de Personal */
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}

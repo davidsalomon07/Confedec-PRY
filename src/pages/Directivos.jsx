@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import './App.css';
+import { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 function Directivo() {
-  const navigate = useNavigate();
-
+  
   // 1. Scroll al inicio
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
-  // 2. Candado de seguridad
-  const [isLocked, setIsLocked] = useState(true);
+  // 2. RECIBIMOS EL PODER DEL LAYOUT
+  const [isLocked, setIsLocked] = useOutletContext();
 
   // --- ESTADOS PARA DIRECTOR GENERAL ---
   const [dirNombre, setDirNombre] = useState("");
@@ -35,61 +33,77 @@ function Directivo() {
   const [secTelf, setSecTelf] = useState("");
   const [secCedula, setSecCedula] = useState("");
 
-  const handleLogout = () => navigate('/');
-  const toggleLock = () => setIsLocked(!isLocked);
-
   const handleUpdate = () => {
     alert("¡Datos de autoridades guardados correctamente!");
-    setIsLocked(true); 
+    setIsLocked(true); // Bloqueamos de nuevo al guardar
   };
 
   return (
-    <div className="profile-wrapper">
-      
-      {/* --- HEADER --- */}
-      <header className="profile-navbar-blue">
-        <div className="navbar-left">
-          <img src="/confedec.png" alt="Logo" className="nav-logo" />
-          <div className="nav-text-block">
-            <h1 className="brand-title">CONFEDEC</h1>
-            <p className="brand-subtitle">REGISTRO DE INFORMACIÓN</p>
-          </div>
-        </div>
-
-        <nav className="navbar-tabs-container">
-          <NavLink to="/perfil" className="nav-tab-link">IDENTIFICACIÓN</NavLink>
-          <NavLink to="/informacion" className="nav-tab-link">INFORMACIÓN</NavLink>
-          <NavLink to="/ubicacion" className="nav-tab-link">UBICACIÓN</NavLink>
-          <NavLink to="/directivo" className={({ isActive }) => isActive ? "nav-tab-link active" : "nav-tab-link"}>DIRECTIVO</NavLink>
-          <NavLink to="/estudiantes" className="nav-tab-link">ESTUDIANTES</NavLink>
-          <NavLink to="/paralelos" className="nav-tab-link">PARALELOS</NavLink>
-          <NavLink to="/personal" className="nav-tab-link">PERSONAL</NavLink>
-        </nav>
-
-        <div className="navbar-right-logout">
-          <button className="logout-circle-btn" onClick={handleLogout} title="Cerrar Sesión">
-             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-          </button>
-          <span className="logout-label">CERRAR SESIÓN</span>
-        </div>
-      </header>
-
-      {/* --- BARRA DE SEGURIDAD --- */}
-      <div className="security-bar">
-        <button className={`lock-toggle-btn ${isLocked ? 'locked' : 'unlocked'}`} onClick={toggleLock}>
-          {isLocked ? 'DESBLOQUEAR EDICIÓN' : 'EDICIÓN ACTIVADA'}
-        </button>
-      </div>
-
-      <div className="profile-hero-banner">
+    <>
+      {/* ✅ BANNER CON BOTÓN FLOTANTE */}
+      <div className="profile-hero-banner" style={{ position: 'relative' }}>
         <div className="hero-content">
           <img src="/confedec.png" alt="Logo" className="hero-logo-large" />
           <h1>CUADRO DIRECTIVO</h1>
           <p>Datos de Contacto de las Autoridades Institucionales</p>
         </div>
+
+        {/* BOTÓN DE ACCIÓN EN LA ESQUINA SUPERIOR DERECHA */}
+        <div style={{ position: 'absolute', top: '30px', right: '30px' }}>
+          <button 
+            onClick={() => setIsLocked(!isLocked)}
+            className="banner-action-btn"
+            style={{
+              backgroundColor: isLocked ? 'rgba(255, 255, 255, 0.2)' : '#00d2d3',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.4)',
+              padding: '10px 20px',
+              borderRadius: '30px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(5px)'
+            }}
+          >
+            {isLocked ? (
+              <>
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                EDITAR AUTORIDADES
+              </>
+            ) : (
+              <>
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                CANCELAR
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
+      {/* 📝 CONTENIDO PRINCIPAL */}
       <main className="profile-data-grid">
+        
+        {/* AVISO DE MODO EDICIÓN */}
+        {!isLocked && (
+          <div style={{ 
+            gridColumn: '1 / -1', 
+            background: '#e1f5fe', 
+            padding: '15px', 
+            borderRadius: '8px', 
+            marginBottom: '20px', 
+            borderLeft: '5px solid #00d2d3', 
+            color: '#0277bd',
+            maxWidth: '1200px',
+            margin: '0 auto 20px auto',
+            width: '90%'
+          }}>
+            <strong>✏️ Editando Cuadro Directivo:</strong> Actualice la información de las autoridades y guarde los cambios.
+          </div>
+        )}
+
         <div className="data-container">
           
           {/* BLOQUE 1: DIRECTOR GENERAL */}
@@ -159,7 +173,7 @@ function Directivo() {
              <label>Número de Contacto</label>
              <input type="tel" className="data-input" value={secTelf} onChange={(e) => setSecTelf(e.target.value)} disabled={isLocked} />
 
-             <button className="update-data-btn" disabled={isLocked} onClick={handleUpdate}>
+             <button className="update-data-btn" disabled={isLocked} onClick={handleUpdate} style={{opacity: isLocked ? 0.5 : 1}}>
                GUARDAR CAMBIOS
              </button>
              <h2 className="watermark-text">AUTORIDAD</h2>
@@ -167,11 +181,7 @@ function Directivo() {
 
         </div>
       </main>
-
-      <footer className="profile-footer">
-        © 2026 CONFEDEC - Sistema de Gestión de Información Educativa
-      </footer>
-    </div>
+    </>
   );
 }
 
