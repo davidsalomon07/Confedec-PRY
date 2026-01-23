@@ -10,7 +10,6 @@ import DashboardLayout from './layout/DashboardLayout.jsx'
 import App from './App.jsx'
 
 // 3. IMPORTA TUS PÁGINAS (Carpeta pages)
-// 👇 AQUÍ ESTABA EL ERROR: Ahora le decimos que busque dentro de "pages/"
 import Profile from './pages/Profile.jsx'
 import Informacion from './pages/Informacion.jsx'
 import Ubicacion from './pages/Ubicacion.jsx'
@@ -18,6 +17,7 @@ import Directivo from './pages/Directivos.jsx'
 import Estudiantes from './pages/Estudiantes.jsx'
 import Paralelos from './pages/Paralelos.jsx'
 import Personal from './pages/Personal.jsx'
+import Consultas from './pages/Consultas.jsx' // 👈 NUEVA PÁGINA IMPORTADA
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -36,6 +36,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
            <Route path="/estudiantes" element={<Estudiantes />} />
            <Route path="/paralelos" element={<Paralelos />} />
            <Route path="/personal" element={<Personal />} />
+           
+           {/* 👇 NUEVA RUTA AGREGADA */}
+           <Route path="/consultas" element={<Consultas />} />
+           
         </Route>
 
       </Routes>
