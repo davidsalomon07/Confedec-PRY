@@ -35,9 +35,12 @@ const DashboardLayout = () => {
           <NavLink to="/estudiantes" className="nav-tab-link">ESTUDIANTES</NavLink>
           <NavLink to="/paralelos" className="nav-tab-link">PARALELOS</NavLink>
           <NavLink to="/personal" className="nav-tab-link">PERSONAL</NavLink>
+          
+          {/* 👇 NUEVO BOTÓN AGREGADO AQUÍ 👇 */}
+          <NavLink to="/consultas" className="nav-tab-link">CONSULTAS</NavLink>
         </nav>
 
-        {/* --- AQUÍ ESTÁ EL CAMBIO: SOLO CERRAR SESIÓN --- */}
+        {/* --- SOLO CERRAR SESIÓN --- */}
         <div className="navbar-right-logout">
           <button className="logout-circle-btn" onClick={handleLogout} title="Cerrar Sesión">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

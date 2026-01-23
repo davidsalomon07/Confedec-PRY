@@ -6,8 +6,13 @@ function Profile() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
   const [isLocked, setIsLocked] = useOutletContext();
 
+  // 1. ESTADO NUEVO PARA CONTROLAR EL SELECT
+  const [tipoSostenimiento, setTipoSostenimiento] = useState("fiscomisional");
+
   const [distrito, setDistrito] = useState("Zona 9 - Distrito 17D05");
   const [historia, setHistoria] = useState("La institución fue fundada con la misión de brindar educación católica de alta calidad, basada en los valores de San Vicente de Paúl, sirviendo a la comunidad desde 1980...");
+  
+  // Estos estados se usarán solo cuando sea Obra Social
   const [tipoObraSocial, setTipoObraSocial] = useState("Educativa - Social");
   const [descripcionObra, setDescripcionObra] = useState("Detalle aquí las actividades y el alcance de la obra social que realiza la institución...");
 
@@ -61,10 +66,9 @@ function Profile() {
       <main className="profile-data-grid">
         <div className="data-container">
           
-          {/* 🛠️ AVISO MOVIDO AQUÍ ADENTRO PARA QUE RESPETE EL ANCHO */}
           {!isLocked && (
             <div style={{ 
-              gridColumn: '1 / -1', // Esto hace que ocupe todo el ancho de las columnas
+              gridColumn: '1 / -1', 
               background: '#e1f5fe', 
               padding: '15px', 
               borderRadius: '8px', 
@@ -81,12 +85,21 @@ function Profile() {
           <div className="data-column">
             <div className="section-label">CONFIGURACIÓN BÁSICA</div>
             <label>Tipo de Sostenimiento</label>
-            <select className="data-select" disabled={isLocked}>
+            
+            {/* 2. SELECT ACTUALIZADO CON VALUE, ONCHANGE Y NUEVA OPCIÓN */}
+            <select 
+                className="data-select" 
+                disabled={isLocked}
+                value={tipoSostenimiento}
+                onChange={(e) => setTipoSostenimiento(e.target.value)}
+            >
               <option value="fiscomisional">Fiscomisional</option>
               <option value="particular">Particular</option>
               <option value="fiscal">Fiscal</option>
               <option value="municipal">Municipal</option>
+              <option value="obra-social">Obra Social</option> {/* Nueva opción */}
             </select>
+
             <label>Entidad Patrocinada / Congregación</label>
             <select className="data-select" disabled={isLocked}>
               <option>Hermanas de la Caridad</option>
@@ -106,10 +119,31 @@ function Profile() {
             <input type="date" className="data-input" disabled={isLocked} defaultValue="1980-05-24" />
             <label>Breve Historia Institucional</label>
             <textarea className="data-textarea" value={historia} onChange={(e) => setHistoria(e.target.value)} disabled={isLocked} rows="4" />
-            <label>Tipo de Obra Social</label>
-            <input type="text" className="data-input" value={tipoObraSocial} onChange={(e) => setTipoObraSocial(e.target.value)} disabled={isLocked} placeholder="Ej: Educativa, Asistencial, etc." />
-            <label>Descripción de la Obra Social</label>
-            <textarea className="data-textarea" value={descripcionObra} onChange={(e) => setDescripcionObra(e.target.value)} disabled={isLocked} rows="5" />
+            
+            {/* 3. LÓGICA DE RENDERIZADO CONDICIONAL */}
+            {tipoSostenimiento === 'obra-social' && (
+                <div style={{ marginTop: '15px', animation: 'fadeIn 0.5s' }}>
+                    <div style={{borderTop: '1px dashed #444', margin: '10px 0'}}></div>
+                    <label style={{color: '#00d2d3'}}>Tipo de Obra Social</label>
+                    <input 
+                        type="text" 
+                        className="data-input" 
+                        value={tipoObraSocial} 
+                        onChange={(e) => setTipoObraSocial(e.target.value)} 
+                        disabled={isLocked} 
+                        placeholder="Ej: Educativa, Asistencial, etc." 
+                    />
+                    <label style={{color: '#00d2d3'}}>Descripción de la Obra Social</label>
+                    <textarea 
+                        className="data-textarea" 
+                        value={descripcionObra} 
+                        onChange={(e) => setDescripcionObra(e.target.value)} 
+                        disabled={isLocked} 
+                        rows="5" 
+                    />
+                </div>
+            )}
+
           </div>
 
           {/* COLUMNA 3 */}
@@ -132,6 +166,14 @@ function Profile() {
           </div>
         </div>
       </main>
+      
+      {/* Estilo para la animación suave al aparecer */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </>
   );
 }
