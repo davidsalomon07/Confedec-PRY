@@ -49,7 +49,7 @@ function Directivo() {
         </div>
 
         {/* BOTÓN DE ACCIÓN EN LA ESQUINA SUPERIOR DERECHA */}
-        <div style={{ position: 'absolute', top: '30px', right: '30px' }}>
+        <div className="hero-action-container">
           <button 
             onClick={() => setIsLocked(!isLocked)}
             className="banner-action-btn"

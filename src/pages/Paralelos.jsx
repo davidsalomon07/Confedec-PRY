@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Paralelos() {
-  
+
   // 1. Scroll al inicio
-  useEffect(() => { 
-    window.scrollTo(0, 0); 
+  useEffect(() => {
+    window.scrollTo(0, 0);
   }, []);
 
   // 2. RECIBIMOS EL PODER DEL LAYOUT
@@ -41,8 +41,8 @@ function Paralelos() {
         </div>
 
         {/* BOTÓN DE ACCIÓN EN LA ESQUINA SUPERIOR DERECHA */}
-        <div style={{ position: 'absolute', top: '30px', right: '30px' }}>
-          <button 
+        <div className="hero-action-container">
+          <button
             onClick={() => setIsLocked(!isLocked)}
             className="banner-action-btn"
             style={{
@@ -77,17 +77,17 @@ function Paralelos() {
 
       {/* 📝 CONTENIDO PRINCIPAL */}
       <main className="paralelos-section">
-        
+
         <div className="paralelos-card">
-          
+
           {/* 🛠️ CORRECCIÓN: AVISO MOVIDO DENTRO DE LA TARJETA */}
           {!isLocked && (
-            <div style={{ 
-              background: '#e1f5fe', 
-              padding: '15px', 
-              borderRadius: '8px', 
+            <div style={{
+              background: '#e1f5fe',
+              padding: '15px',
+              borderRadius: '8px',
               marginBottom: '25px', // Un poco de espacio antes del título
-              borderLeft: '5px solid #00d2d3', 
+              borderLeft: '5px solid #00d2d3',
               color: '#0277bd',
               textAlign: 'left' // Aseguramos que el texto se lea bien
             }}>
@@ -124,7 +124,7 @@ function Paralelos() {
             </div>
           </div>
 
-          <button className="paralelos-save-btn" disabled={isLocked} onClick={handleGuardar} style={{opacity: isLocked ? 0.5 : 1}}>
+          <button className="paralelos-save-btn" disabled={isLocked} onClick={handleGuardar} style={{ opacity: isLocked ? 0.5 : 1 }}>
             GUARDAR CAMBIOS
           </button>
         </div>

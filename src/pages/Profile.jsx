@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Profile() {
-  
+
   useEffect(() => { window.scrollTo(0, 0); }, []);
   const [isLocked, setIsLocked] = useOutletContext();
 
@@ -24,8 +24,8 @@ function Profile() {
           <h1>PERFIL DE LA INSTITUCIÓN</h1>
           <p>Gestión Centralizada de Datos Educativos</p>
         </div>
-        <div style={{ position: 'absolute', top: '30px', right: '30px' }}>
-          <button 
+        <div className="hero-action-container">
+          <button
             onClick={() => setIsLocked(!isLocked)}
             className="banner-action-btn"
             style={{
@@ -60,16 +60,16 @@ function Profile() {
 
       <main className="profile-data-grid">
         <div className="data-container">
-          
+
           {/* 🛠️ AVISO MOVIDO AQUÍ ADENTRO PARA QUE RESPETE EL ANCHO */}
           {!isLocked && (
-            <div style={{ 
+            <div style={{
               gridColumn: '1 / -1', // Esto hace que ocupe todo el ancho de las columnas
-              background: '#e1f5fe', 
-              padding: '15px', 
-              borderRadius: '8px', 
-              marginBottom: '20px', 
-              borderLeft: '5px solid #00d2d3', 
+              background: '#e1f5fe',
+              padding: '15px',
+              borderRadius: '8px',
+              marginBottom: '20px',
+              borderLeft: '5px solid #00d2d3',
               color: '#0277bd',
               textAlign: 'left'
             }}>
@@ -125,7 +125,7 @@ function Profile() {
                 <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Bachillerato General</label>
               </div>
             </div>
-            <button className="update-data-btn" disabled={isLocked} onClick={handleUpdate} style={{opacity: isLocked ? 0.5 : 1}}>
+            <button className="update-data-btn" disabled={isLocked} onClick={handleUpdate} style={{ opacity: isLocked ? 0.5 : 1 }}>
               ACTUALIZAR DATOS
             </button>
             <h2 className="watermark-text">CONFEDEC</h2>

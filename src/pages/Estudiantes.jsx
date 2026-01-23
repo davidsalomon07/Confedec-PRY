@@ -66,8 +66,8 @@ function Estudiantes() {
         </div>
 
         {/* BOTÓN DE ACCIÓN */}
-        <div style={{ position: 'absolute', top: '30px', right: '30px' }}>
-          <button 
+        <div className="hero-action-container">
+          <button
             onClick={() => setIsLocked(!isLocked)}
             className="banner-action-btn"
             style={{
@@ -103,15 +103,15 @@ function Estudiantes() {
       {/* 📝 CONTENIDO PRINCIPAL */}
       <main className="students-section">
         <div className="students-left">
-          
+
           {/* AVISO DE MODO EDICIÓN */}
           {!isLocked && (
-            <div style={{ 
-              background: '#e1f5fe', 
-              padding: '15px', 
-              borderRadius: '8px', 
-              marginBottom: '20px', 
-              borderLeft: '5px solid #00d2d3', 
+            <div style={{
+              background: '#e1f5fe',
+              padding: '15px',
+              borderRadius: '8px',
+              marginBottom: '20px',
+              borderLeft: '5px solid #00d2d3',
               color: '#0277bd'
             }}>
               <strong>✏️ Editando Estudiantes:</strong> Ingrese la cantidad de alumnos por género.
@@ -182,7 +182,7 @@ function Estudiantes() {
             className="update-data-btn"
             disabled={isLocked}
             onClick={handleGuardar}
-            style={{opacity: isLocked ? 0.5 : 1}}
+            style={{ opacity: isLocked ? 0.5 : 1 }}
           >
             GUARDAR CAMBIOS
           </button>

@@ -30,7 +30,7 @@ const ecuadorData = {
 };
 
 function Ubicacion() {
-  
+
   // 1. Scroll al inicio
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -64,8 +64,8 @@ function Ubicacion() {
         </div>
 
         {/* BOTÓN DE ACCIÓN EN LA ESQUINA SUPERIOR DERECHA */}
-        <div style={{ position: 'absolute', top: '30px', right: '30px' }}>
-          <button 
+        <div className="hero-action-container">
+          <button
             onClick={() => setIsLocked(!isLocked)}
             className="banner-action-btn"
             style={{
@@ -100,16 +100,16 @@ function Ubicacion() {
 
       {/* 📝 CONTENIDO PRINCIPAL */}
       <main className="profile-data-grid">
-        
+
         {/* AVISO DE MODO EDICIÓN */}
         {!isLocked && (
-          <div style={{ 
-            gridColumn: '1 / -1', 
-            background: '#e1f5fe', 
-            padding: '15px', 
-            borderRadius: '8px', 
-            marginBottom: '20px', 
-            borderLeft: '5px solid #00d2d3', 
+          <div style={{
+            gridColumn: '1 / -1',
+            background: '#e1f5fe',
+            padding: '15px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            borderLeft: '5px solid #00d2d3',
             color: '#0277bd',
             maxWidth: '1200px',
             margin: '0 auto 20px auto',
@@ -120,7 +120,7 @@ function Ubicacion() {
         )}
 
         <div className="data-container four-columns">
-          
+
           {/* COLUMNA 1: ZONIFICACIÓN */}
           <div className="data-column">
             <div className="section-label">ZONIFICACIÓN</div>
@@ -131,7 +131,7 @@ function Ubicacion() {
                 <option key={n} value={n}>Zona {n}</option>
               ))}
             </select>
-            
+
             <label>Régimen Escolar</label>
             <select className="data-select" disabled={isLocked}>
               <option value="sierra">Sierra / Amazonía</option>
@@ -164,10 +164,10 @@ function Ubicacion() {
             <div className="section-label">DATOS ESPECÍFICOS</div>
             <label>Distrito Educativo</label>
             <input type="text" className="data-input" disabled={isLocked} placeholder="Ej: 17D05" />
-            
+
             <label>Ciudad / Parroquia</label>
             <input type="text" className="data-input" disabled={isLocked} placeholder="Ingrese ciudad" />
-            
+
             <label>Enlace Google Maps</label>
             <input type="text" className="data-input" disabled={isLocked} placeholder="https://maps.google.com/..." />
           </div>
@@ -183,11 +183,11 @@ function Ubicacion() {
               </div>
             </div>
 
-            <button 
-              className="update-data-btn" 
+            <button
+              className="update-data-btn"
               disabled={isLocked}
               onClick={handleUpdate}
-              style={{opacity: isLocked ? 0.5 : 1}}
+              style={{ opacity: isLocked ? 0.5 : 1 }}
             >
               ACTUALIZAR UBICACIÓN
             </button>

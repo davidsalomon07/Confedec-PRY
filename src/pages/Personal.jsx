@@ -15,7 +15,7 @@ function Personal() {
   const [formData, setFormData] = useState({
     docentesParticulares: '',
     adminParticulares: '',
-    servicio: '', 
+    servicio: '',
     docentesFiscales: '',
     adminFiscales: ''
   });
@@ -45,8 +45,8 @@ function Personal() {
         </div>
 
         {/* BOTÓN DE ACCIÓN EN LA ESQUINA SUPERIOR DERECHA */}
-        <div style={{ position: 'absolute', top: '30px', right: '30px' }}>
-          <button 
+        <div className="hero-action-container">
+          <button
             onClick={() => setIsLocked(!isLocked)}
             className="banner-action-btn"
             style={{
@@ -82,26 +82,26 @@ function Personal() {
       {/* 📝 FORMULARIO PRINCIPAL */}
       <main className="section-content" style={{ paddingBottom: '60px' }}>
         <div className="container" style={{ maxWidth: '900px' }}>
-          
+
           {/* AVISO DE MODO EDICIÓN */}
           {!isLocked && (
-            <div style={{ 
-              background: '#e1f5fe', 
-              padding: '15px', 
-              borderRadius: '8px', 
-              marginBottom: '20px', 
-              borderLeft: '5px solid #00d2d3', 
+            <div style={{
+              background: '#e1f5fe',
+              padding: '15px',
+              borderRadius: '8px',
+              marginBottom: '20px',
+              borderLeft: '5px solid #00d2d3',
               color: '#0277bd'
             }}>
               <strong>✏️ Editando Personal:</strong> Actualice las cantidades de docentes y administrativos.
             </div>
           )}
-          
+
           {/* SECCIÓN 1: PERSONAL PARTICULAR / SERVICIO */}
           <div className="clean-card-box" style={{ marginBottom: '30px' }}>
             <h3 className="clean-card-title" style={{ color: '#0056b3' }}>Personal Particular y Servicio</h3>
             <div className="form-grid-3">
-              
+
               <div className="clean-input-group">
                 <label>Docentes Particulares</label>
                 <input type="number" className="clean-input" name="docentesParticulares" value={formData.docentesParticulares} onChange={handleChange} disabled={isLocked} placeholder="0" />
@@ -124,7 +124,7 @@ function Personal() {
           <div className="clean-card-box">
             <h3 className="clean-card-title" style={{ color: '#662483' }}>Personal Fiscal (Asignado)</h3>
             <div className="form-grid-2">
-              
+
               <div className="clean-input-group">
                 <label>Docentes Fiscales</label>
                 <input type="number" className="clean-input" name="docentesFiscales" value={formData.docentesFiscales} onChange={handleChange} disabled={isLocked} placeholder="0" />
@@ -139,10 +139,10 @@ function Personal() {
           </div>
 
           {/* BOTÓN DE GUARDAR */}
-          <button 
-            className="update-data-btn wide-btn" 
+          <button
+            className="update-data-btn wide-btn"
             style={{ marginTop: '30px', opacity: isLocked ? 0.5 : 1 }}
-            disabled={isLocked} 
+            disabled={isLocked}
             onClick={handleGuardar}
           >
             GUARDAR REGISTRO DE PERSONAL
