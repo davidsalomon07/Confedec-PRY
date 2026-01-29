@@ -1897,3 +1897,447 @@ body {
     grid-template-columns: repeat(4, 1fr) !important;
   }
 }
+
+
+
+/* ======================================================= */
+/* ⚡ CORRECCIÓN VISUAL: BANNER CENTRADO Y DARK MODE ⚡ */
+/* ======================================================= */
+
+/* 1. EL BANNER (Texto e Imagen siempre en el CENTRO) */
+.profile-hero-banner {
+  display: flex !important;
+  flex-direction: column !important; /* Apila Logo, Título y Subtítulo verticalmente */
+  align-items: center !important;    /* Centra todo horizontalmente */
+  justify-content: center !important; /* Centra todo verticalmente */
+  position: relative !important;      /* Necesario para que el botón flote */
+  text-align: center !important;
+  min-height: 250px;
+  padding: 40px 20px;
+  /* Asegura que la imagen de fondo cubra bien */
+  background-size: cover;
+  background-position: center;
+}
+
+/* Aseguramos que el contenido del texto no se estire */
+.hero-content {
+  width: 100%;
+  max-width: 800px;
+  z-index: 2;
+  margin: 0 auto; /* Centrado extra por si acaso */
+}
+
+/* 2. EL BOTÓN (Flotando arriba a la derecha, SIN mover el texto) */
+.hero-action-container {
+  position: absolute !important; /* Lo saca del flujo normal */
+  top: 30px !important;
+  right: 30px !important;
+  z-index: 10;
+  margin: 0 !important; /* Quitamos márgenes viejos */
+}
+
+/* 3. INPUTS ESTILO "PROFILE" (Oscuros y Elegantes) */
+/* Esto arregla que los inputs de Directivo se vean feos */
+
+.data-input,
+.clean-input {
+  background-color: #111 !important; /* Fondo Negro suave */
+  border: 1px solid #333 !important; /* Borde gris sutil */
+  color: #fff !important;            /* Texto blanco */
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+/* Efecto al hacer clic en el input */
+.data-input:focus,
+.clean-input:focus {
+  border-color: #662483 !important; /* Borde Morado */
+  box-shadow: 0 0 10px rgba(102, 36, 131, 0.4);
+  outline: none;
+  background-color: #000 !important;
+}
+
+/* Inputs bloqueados (Candado cerrado) */
+.data-input:disabled,
+.clean-input:disabled {
+  background-color: #1a1a1a !important; /* Un poco más claro para diferenciar */
+  color: #888 !important;
+  border-color: #222 !important;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* 4. GRID DE DIRECTIVOS (Para que se vea ordenado en columnas) */
+.data-container {
+  display: grid;
+  /* Crea columnas automáticas de mínimo 300px */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+  gap: 30px;
+  max-width: 1400px;
+  width: 95%;
+  margin: 40px auto;
+}
+
+/* Etiquetas de los títulos (DIRECTOR, RECTOR, ETC) */
+.section-label {
+  color: #8e44ad; /* Morado claro */
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+/* Etiquetas de los campos (Nombre, Cédula...) */
+.data-column label {
+  color: #ccc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+  display: block;
+  text-transform: uppercase;
+}
+
+/* 5. RESPONSIVE (Celulares) */
+@media (max-width: 768px) {
+  .hero-action-container {
+    position: relative !important; /* En celular sí baja para no tapar el logo */
+    top: auto !important;
+    right: auto !important;
+    margin-top: 20px !important;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .data-container {
+    grid-template-columns: 1fr; /* Una sola columna en celular */
+  }
+}
+
+
+/* ======================================================= */
+/* 💎 NUEVO DISEÑO: TARJETAS DE DIRECTIVOS (EXECUTIVE CARDS) */
+/* ======================================================= */
+
+/* El Grid Principal (2 columnas amplias) */
+.directivos-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  width: 95%;
+  margin: 40px auto;
+}
+
+/* La Tarjeta Individual */
+.directivo-card {
+  background-color: #111; /* Fondo oscuro */
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 30px;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden; /* Para contener el brillo */
+}
+
+/* Efecto Hover: Brillo morado y subida */
+.directivo-card:hover {
+  transform: translateY(-5px);
+  border-color: #662483;
+  box-shadow: 0 10px 30px rgba(102, 36, 131, 0.15);
+}
+
+/* Encabezado de la Tarjeta (Ícono + Título) */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #222;
+}
+
+/* Círculo del Ícono */
+.icon-circle {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #662483 0%, #3c096c 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  box-shadow: 0 0 15px rgba(102, 36, 131, 0.4);
+}
+
+.card-title {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+/* Ajuste Responsive para móviles */
+@media (max-width: 768px) {
+  .directivos-grid-container {
+    grid-template-columns: 1fr; /* Una sola columna */
+  }
+}
+
+
+
+/* ======================================================= */
+/* 📸 NUEVOS ESTILOS: FOTOS EN TARJETAS DIRECTIVAS 📸 */
+/* ======================================================= */
+
+/* Contenedor flexible dentro de la tarjeta para alinear Foto + Datos */
+.card-content-flex {
+  display: flex;
+  gap: 25px;
+  align-items: flex-start; /* Alinea arriba */
+}
+
+/* Sección de la Foto (Izquierda) */
+.card-photo-section {
+  flex-shrink: 0; /* Que no se aplaste */
+  width: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* La imagen de la foto */
+.directivo-photo {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%; /* Redonda */
+  object-fit: cover; /* Recorta la imagen para que no se deforme */
+  /* Borde morado brillante estilo Confedec */
+  border: 3px solid #662483; 
+  box-shadow: 0 0 20px rgba(102, 36, 131, 0.4);
+  background-color: #222; /* Fondo por si no carga */
+  transition: transform 0.3s ease;
+}
+
+.directivo-card:hover .directivo-photo {
+  transform: scale(1.05); /* Efecto zoom sutil al pasar el mouse */
+}
+
+/* Input pequeño para la URL de la foto */
+.photo-url-input {
+  font-size: 0.7rem !important;
+  padding: 5px 8px !important;
+  margin-bottom: 0 !important;
+  text-align: center;
+  background: #000 !important;
+  border-color: #662483 !important;
+}
+
+/* Sección de los Datos (Derecha) */
+.card-body-data {
+  flex-grow: 1; /* Ocupa el resto del espacio */
+  width: 100%;
+}
+
+/* RESPONSIVE: En celulares muy angostos, poner la foto arriba */
+@media (max-width: 450px) {
+  .card-content-flex {
+    flex-direction: column;
+    align-items: center;
+  }
+  .card-body-data {
+    width: 100%;
+  }
+}
+
+
+
+/* ======================================================= */
+/* 🚀 HEADER FINAL: ALTO, COMPACTO Y LÍNEA SIMPLE 🚀 */
+/* ======================================================= */
+
+/* 1. CONTENEDOR PRINCIPAL (Altura original) */
+.profile-navbar-blue {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  height: 90px;
+  background-color: #000;
+  border-bottom: 3px solid #662483;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+/* 2. LOGO (Izquierda) */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 220px;
+}
+
+.nav-logo {
+  height: 55px;
+  width: auto;
+}
+
+.nav-text-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.brand-subtitle {
+  font-size: 0.7rem;
+  color: #662483;
+  margin: 0;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+/* 3. PESTAÑAS (CENTRO - COMPACTAS) */
+.navbar-tabs-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 5px; /* Espacio reducido entre pestañas */
+  margin: 0 10px;
+}
+
+.nav-tab-link {
+  color: #aaa;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 10px 15px;
+  /* Quitamos borderRadius para que la línea inferior sea recta y pegada */
+  transition: all 0.3s ease;
+  white-space: nowrap; /* Evita que se rompa el texto */
+  border-bottom: 0.25px solid transparent; /* Prepara el espacio para la línea */
+}
+
+.nav-tab-link:hover {
+  color: #fff;
+  /* background-color quitado para hover más limpio, solo cambio de color */
+}
+
+/* --- CORRECCIÓN AQUÍ: SOLO LÍNEA SIMPLE --- */
+.nav-tab-link.active {
+  color: #fff;
+  border-bottom-color: #662483; /* Solo cambia el color del borde inferior */
+  /* Se eliminó el 'background: gradient...' que causaba el efecto no deseado */
+}
+
+/* 4. CERRAR SESIÓN (Derecha - Espacio asegurado) */
+.navbar-right-logout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.logout-circle-btn {
+  background: transparent;
+  border: 1px solid #333;
+  color: #fff;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 4px;
+}
+
+.logout-circle-btn:hover {
+  border-color: #d63031;
+  color: #d63031;
+  background: rgba(214, 48, 49, 0.1);
+}
+
+.logout-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+  white-space: nowrap; /* Asegura una sola línea */
+}
+
+/* --- RESPONSIVE --- */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hamburger-btn .bar {
+  width: 28px;
+  height: 3px;
+  background-color: white;
+  border-radius: 2px;
+}
+
+@media (max-width: 1200px) {
+  .navbar-tabs-container {
+    display: none;
+  }
+  
+  .navbar-tabs-container.menu-visible {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 90px;
+    left: 0;
+    width: 100%;
+    background: #000;
+    border-bottom: 3px solid #662483;
+    padding: 20px 0;
+    gap: 10px;
+    z-index: 999;
+  }
+
+  .nav-tab-link {
+     /* En móvil sí queremos que ocupen el ancho */
+    width: 90%;
+    text-align: center;
+    border-bottom: none; /* En móvil suele verse mejor sin la línea inferior, o puedes dejarla */
+    background-color: rgba(255,255,255,0.05);
+    border-radius: 8px;
+  }
+  
+  .nav-tab-link.active {
+      background-color: #662483; /* En móvil un fondo sólido se ve mejor */
+      border-bottom-color: transparent;
+  }
+
+  .hamburger-btn { display: flex; }
+  .navbar-right-logout { display: none; }
+}

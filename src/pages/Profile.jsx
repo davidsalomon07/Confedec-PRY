@@ -6,175 +6,186 @@ function Profile() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
   const [isLocked, setIsLocked] = useOutletContext();
 
-  // 1. ESTADO NUEVO PARA CONTROLAR EL SELECT
+  // 1. ESTADOS
+  const [amie, setAmie] = useState(""); // NUEVO: CÓDIGO AMIE
   const [tipoSostenimiento, setTipoSostenimiento] = useState("fiscomisional");
-
   const [distrito, setDistrito] = useState("Zona 9 - Distrito 17D05");
+  const [fechaCreacion, setFechaCreacion] = useState("1980-05-24");
   const [historia, setHistoria] = useState("La institución fue fundada con la misión de brindar educación católica de alta calidad, basada en los valores de San Vicente de Paúl, sirviendo a la comunidad desde 1980...");
   
-  // Estos estados se usarán solo cuando sea Obra Social
+  // Estados para Obra Social
   const [tipoObraSocial, setTipoObraSocial] = useState("Educativa - Social");
   const [descripcionObra, setDescripcionObra] = useState("Detalle aquí las actividades y el alcance de la obra social que realiza la institución...");
 
   const handleUpdate = () => {
-    alert("¡Datos actualizados correctamente en el sistema!");
+    alert("¡Perfil institucional actualizado correctamente!");
     setIsLocked(true);
   };
 
+  // Íconos SVG para las tarjetas
+  const Icons = {
+    School: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4 8 4v14"/><path d="M17 21v-8H7v8"/></svg>,
+    Book: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
+    Settings: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+    Graduation: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+  };
+
+  // Helper de estilos
+  const labelStyle = { color: '#aaa', fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '5px', textTransform: 'uppercase' };
+
   return (
     <>
-      <div className="profile-hero-banner" style={{ position: 'relative' }}>
-        <div className="hero-content">
+      {/* 1. BANNER (Mismo estilo que Directivos) */}
+      <div className="profile-hero-banner" style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '40px 20px' }}>
+        <div className="hero-content" style={{ width: '100%', zIndex: 1 }}>
           <img src="/confedec.png" alt="Logo" className="hero-logo-large" />
-          <h1>PERFIL DE LA INSTITUCIÓN</h1>
+          <h1>PERFIL INSTITUCIONAL</h1>
           <p>Gestión Centralizada de Datos Educativos</p>
         </div>
-        <div className="hero-action-container">
-          <button
+        <div className="hero-action-container" style={{ position: 'absolute', top: '30px', right: '30px', zIndex: 10 }}>
+          <button 
             onClick={() => setIsLocked(!isLocked)}
             className="banner-action-btn"
-            style={{
-              backgroundColor: isLocked ? 'rgba(255, 255, 255, 0.2)' : '#00d2d3',
-              color: 'white',
-              border: '1px solid rgba(255,255,255,0.4)',
-              padding: '10px 20px',
-              borderRadius: '30px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.3s ease',
-              backdropFilter: 'blur(5px)'
-            }}
+            style={{ backgroundColor: isLocked ? 'rgba(255, 255, 255, 0.2)' : '#00d2d3', color: 'white', border: '1px solid rgba(255,255,255,0.4)', padding: '10px 20px', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s ease', backdropFilter: 'blur(5px)' }}
           >
-            {isLocked ? (
-              <>
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                EDITAR PERFIL
-              </>
-            ) : (
-              <>
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                CANCELAR
-              </>
-            )}
+            {isLocked ? (<><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>EDITAR PERFIL</>) : (<><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>CANCELAR</>)}
           </button>
         </div>
       </div>
 
       <main className="profile-data-grid">
-        <div className="data-container">
+        
+        {/* Aviso de Edición */}
+        {!isLocked && (
+          <div style={{ maxWidth: '1200px', width: '95%', margin: '0 auto 20px auto', background: '#e1f5fe', padding: '15px', borderRadius: '8px', borderLeft: '5px solid #00d2d3', color: '#0277bd', textAlign: 'left' }}>
+            <strong>✏️ Editando Perfil:</strong> Modifique el Código AMIE, historia y oferta académica.
+          </div>
+        )}
 
-          {/* 🛠️ AVISO MOVIDO AQUÍ ADENTRO PARA QUE RESPETE EL ANCHO */}
-          {!isLocked && (
-            <div style={{
-              gridColumn: '1 / -1', // Esto hace que ocupe todo el ancho de las columnas
-              background: '#e1f5fe',
-              padding: '15px',
-              borderRadius: '8px',
-              marginBottom: '20px',
-              borderLeft: '5px solid #00d2d3',
-              color: '#0277bd',
-              textAlign: 'left'
-            }}>
-              <strong>✏️ Editando Perfil:</strong> Modifique la configuración básica, historia y obra social.
+        {/* 2. GRID DE TARJETAS (Usando clases de Directivos para consistencia) */}
+        <div className="directivos-grid-container">
+
+          {/* TARJETA 1: IDENTIFICACIÓN (CON CÓDIGO AMIE) */}
+          <div className="directivo-card">
+            <div className="card-header">
+              <div className="icon-circle"><Icons.School /></div>
+              <h3 className="card-title">IDENTIFICACIÓN</h3>
+            </div>
+            <div className="card-body">
+              {/* 🔥 CÓDIGO AMIE IMPORTANTE */}
+              <label style={{...labelStyle, color: '#00d2d3', fontSize: '0.9rem'}}>CÓDIGO AMIE</label>
+              <input 
+                type="text" 
+                className="data-input" 
+                value={amie} 
+                onChange={(e) => setAmie(e.target.value)} 
+                disabled={isLocked} 
+                placeholder="Ej: 17H02841" 
+                style={{border: '2px solid #00d2d3', fontWeight: 'bold'}}
+              />
+
+              <label style={labelStyle}>FECHA DE CREACIÓN</label>
+              <input type="date" className="data-input" value={fechaCreacion} onChange={(e) => setFechaCreacion(e.target.value)} disabled={isLocked} />
+
+              <label style={labelStyle}>DISTRITO EDUCATIVO</label>
+              <input type="text" className="data-input" value={distrito} onChange={(e) => setDistrito(e.target.value)} disabled={isLocked} />
+            </div>
+          </div>
+
+          {/* TARJETA 2: CONFIGURACIÓN Y SOSTENIMIENTO */}
+          <div className="directivo-card">
+            <div className="card-header">
+              <div className="icon-circle"><Icons.Settings /></div>
+              <h3 className="card-title">GESTIÓN</h3>
+            </div>
+            <div className="card-body">
+              <label style={labelStyle}>TIPO DE SOSTENIMIENTO</label>
+              <select className="data-select" value={tipoSostenimiento} onChange={(e) => setTipoSostenimiento(e.target.value)} disabled={isLocked}>
+                <option value="fiscomisional">Fiscomisional</option>
+                <option value="particular">Particular</option>
+                <option value="fiscal">Fiscal</option>
+                <option value="municipal">Municipal</option>
+                <option value="obra-social">Obra Social</option>
+              </select>
+
+              <label style={labelStyle}>ENTIDAD PATROCINADORA</label>
+              <select className="data-select" disabled={isLocked}>
+                <option>Hermanas de la Caridad</option>
+                <option>Salesianos de Don Bosco</option>
+                <option>Compañía de Jesús (Jesuitas)</option>
+                <option>Hermanos Cristianos de La Salle</option>
+                <option>Dominicos</option>
+              </select>
+            </div>
+          </div>
+
+          {/* TARJETA 3: HISTORIA */}
+          <div className="directivo-card" style={{ gridColumn: 'span 1' }}> {/* Ocupa 1 espacio */}
+            <div className="card-header">
+              <div className="icon-circle"><Icons.Book /></div>
+              <h3 className="card-title">RESEÑA HISTÓRICA</h3>
+            </div>
+            <div className="card-body">
+              <textarea 
+                className="data-textarea" 
+                value={historia} 
+                onChange={(e) => setHistoria(e.target.value)} 
+                disabled={isLocked} 
+                rows="6"
+                style={{ resize: 'none' }}
+              />
+            </div>
+          </div>
+
+          {/* TARJETA 4: OFERTA ACADÉMICA */}
+          <div className="directivo-card">
+            <div className="card-header">
+              <div className="icon-circle"><Icons.Graduation /></div>
+              <h3 className="card-title">OFERTA ACADÉMICA</h3>
+            </div>
+            <div className="card-body">
+              <div className={`educational-level-box ${isLocked ? 'box-locked' : ''}`} style={{background: 'transparent', border: 'none', padding: 0}}>
+                <div className="checkbox-grid">
+                  <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Inicial (3-4 años)</label>
+                  <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Preparatoria (1º EGB)</label>
+                  <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Básica Elemental</label>
+                  <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Básica Media</label>
+                  <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Básica Superior</label>
+                  <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Bachillerato General</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* TARJETA 5: OBRA SOCIAL (CONDICIONAL) */}
+          {tipoSostenimiento === 'obra-social' && (
+            <div className="directivo-card" style={{ gridColumn: '1 / -1', border: '2px dashed #00d2d3' }}>
+              <div className="card-header">
+                <div className="icon-circle" style={{background: '#00d2d3'}}>🤝</div>
+                <h3 className="card-title" style={{color: '#00d2d3'}}>OBRA SOCIAL</h3>
+              </div>
+              <div className="card-body" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <label style={labelStyle}>TIPO DE OBRA</label>
+                  <input type="text" className="data-input" value={tipoObraSocial} onChange={(e) => setTipoObraSocial(e.target.value)} disabled={isLocked} />
+                </div>
+                <div>
+                  <label style={labelStyle}>DESCRIPCIÓN</label>
+                  <textarea className="data-textarea" value={descripcionObra} onChange={(e) => setDescripcionObra(e.target.value)} disabled={isLocked} rows="3" />
+                </div>
+              </div>
             </div>
           )}
 
-          {/* COLUMNA 1 */}
-          <div className="data-column">
-            <div className="section-label">CONFIGURACIÓN BÁSICA</div>
-            <label>Tipo de Sostenimiento</label>
-            
-            {/* 2. SELECT ACTUALIZADO CON VALUE, ONCHANGE Y NUEVA OPCIÓN */}
-            <select 
-                className="data-select" 
-                disabled={isLocked}
-                value={tipoSostenimiento}
-                onChange={(e) => setTipoSostenimiento(e.target.value)}
-            >
-              <option value="fiscomisional">Fiscomisional</option>
-              <option value="particular">Particular</option>
-              <option value="fiscal">Fiscal</option>
-              <option value="municipal">Municipal</option>
-              <option value="obra-social">Obra Social</option> {/* Nueva opción */}
-            </select>
-
-            <label>Entidad Patrocinada / Congregación</label>
-            <select className="data-select" disabled={isLocked}>
-              <option>Hermanas de la Caridad</option>
-              <option>Salesianos de Don Bosco</option>
-              <option>Compañía de Jesús (Jesuitas)</option>
-              <option>Hermanos Cristianos de La Salle</option>
-              <option>Dominicos</option>
-            </select>
-            <label>Distrito Educativo</label>
-            <input type="text" className="data-input" value={distrito} onChange={(e) => setDistrito(e.target.value)} disabled={isLocked} />
-          </div>
-
-          {/* COLUMNA 2 */}
-          <div className="data-column">
-            <div className="section-label">RESEÑA Y OBRA SOCIAL</div>
-            <label>Fecha de Creación</label>
-            <input type="date" className="data-input" disabled={isLocked} defaultValue="1980-05-24" />
-            <label>Breve Historia Institucional</label>
-            <textarea className="data-textarea" value={historia} onChange={(e) => setHistoria(e.target.value)} disabled={isLocked} rows="4" />
-            
-            {/* 3. LÓGICA DE RENDERIZADO CONDICIONAL */}
-            {tipoSostenimiento === 'obra-social' && (
-                <div style={{ marginTop: '15px', animation: 'fadeIn 0.5s' }}>
-                    <div style={{borderTop: '1px dashed #444', margin: '10px 0'}}></div>
-                    <label style={{color: '#00d2d3'}}>Tipo de Obra Social</label>
-                    <input 
-                        type="text" 
-                        className="data-input" 
-                        value={tipoObraSocial} 
-                        onChange={(e) => setTipoObraSocial(e.target.value)} 
-                        disabled={isLocked} 
-                        placeholder="Ej: Educativa, Asistencial, etc." 
-                    />
-                    <label style={{color: '#00d2d3'}}>Descripción de la Obra Social</label>
-                    <textarea 
-                        className="data-textarea" 
-                        value={descripcionObra} 
-                        onChange={(e) => setDescripcionObra(e.target.value)} 
-                        disabled={isLocked} 
-                        rows="5" 
-                    />
-                </div>
-            )}
-
-          </div>
-
-          {/* COLUMNA 3 */}
-          <div className="data-column">
-            <div className="section-label">OFERTA ACADÉMICA</div>
-            <div className={`educational-level-box ${isLocked ? 'box-locked' : ''}`}>
-              <div className="checkbox-grid">
-                <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Inicial (3-4 años)</label>
-                <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Preparatoria (1º EGB)</label>
-                <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Básica Elemental</label>
-                <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Básica Media</label>
-                <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Básica Superior</label>
-                <label className="check-item"><input type="checkbox" disabled={isLocked} defaultChecked /> Bachillerato General</label>
-              </div>
-            </div>
-            <button className="update-data-btn" disabled={isLocked} onClick={handleUpdate} style={{ opacity: isLocked ? 0.5 : 1 }}>
-              ACTUALIZAR DATOS
-            </button>
-            <h2 className="watermark-text">CONFEDEC</h2>
-          </div>
         </div>
+
+        <div style={{ maxWidth: '400px', margin: '0 auto 40px auto', padding: '0 20px' }}>
+          <button className="update-data-btn" disabled={isLocked} onClick={handleUpdate} style={{ opacity: isLocked ? 0.5 : 1 }}>
+            ACTUALIZAR PERFIL
+          </button>
+        </div>
+
       </main>
-      
-      {/* Estilo para la animación suave al aparecer */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </>
   );
 }
