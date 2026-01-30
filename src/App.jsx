@@ -6,6 +6,11 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
 
+  // --- NUEVOS ESTADOS AÑADIDOS ---
+  const [usuario, setUsuario] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
   // 1. Función para el Scroll Suave (Faltaba esto)
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
@@ -14,12 +19,33 @@ function App() {
     }
   };
 
-  // 2. Función del Login
-  const handleLogin = (e) => {
+  // 2. Función del Login (MODIFICADA PARA CONECTAR AL BACKEND)
+  const handleLogin = async (e) => {
     e.preventDefault(); 
-    // Aquí iría la validación real. Por ahora redirige al perfil:
-    setShowLogin(false); // Cerramos el modal
-    navigate('/perfil');
+    setError(''); 
+
+    try {
+      // Petición al servidor local de Node.js que configuramos
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // --- GUARDAMOS LOS DATOS DE LA BD PARA QUE SE REFLEJEN EN EL PERFIL ---
+        localStorage.setItem('user_data', JSON.stringify(data.user)); 
+        
+        setShowLogin(false); 
+        navigate('/perfil');
+      } else {
+        setError(data.error || 'Credenciales incorrectas');
+      }
+    } catch (err) {
+      setError('Error al conectar con el servidor. ¿Está encendido el backend?');
+    }
   };
 
   return (
@@ -45,7 +71,10 @@ function App() {
 
           <button 
             className="login-btn-flashy" 
-            onClick={() => setShowLogin(true)}
+            onClick={() => {
+              setShowLogin(true);
+              setError(''); // Limpia errores al abrir
+            }}
           >
             INICIO SESIÓN
           </button>
@@ -156,7 +185,7 @@ function App() {
                 </div>
               </div>
               
-              <button className="map-btn-link" onClick={() => window.open('https://www.google.com/maps/place/CONFEDEC/@-0.2075885,-78.4884672,17z/data=!3m1!4b1!4m6!3m5!1s0x91d59a05dd7c38af:0x80d5cd75fc27cbf!8m2!3d-0.2075939!4d-78.4858923!16s%2Fg%2F11cks2mkf6?entry=ttu&g_ep=EgoyMDI2MDEwNy4wIKXMDSoASAFQAw%3D%3D', '_blank')}>
+              <button className="map-btn-link" onClick={() => window.open('https://www.google.com/maps', '_blank')}>
                 Abrir en Google Maps ↗
               </button>
             </div>
@@ -170,7 +199,7 @@ function App() {
                 scrolling="no" 
                 marginHeight="0" 
                 marginWidth="0" 
-                src="https://maps.google.com/maps?q=Calle+Andalucia+N24-63+y+Madrid+Quito&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.790251745486!2d-78.4891244!3d-0.2131908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d59a107663276d%3A0x63319077227448d3!2sAndaluc%C3%ADa%20N24-63%2C%20Quito%20170143!5e0!3m2!1ses!2sec!4v1700000000000!5m2!1ses!2sec"
                 allowFullScreen
               >
               </iframe>
@@ -193,10 +222,25 @@ function App() {
             <h2>Bienvenido</h2>
             <p>Plataforma de Gestión</p>
             
-            {/* Formulario limpio y conectado */}
             <form className="login-form" onSubmit={handleLogin}>
-              <input type="text" placeholder="Usuario / Código AMIE" required />
-              <input type="password" placeholder="Contraseña" required />
+              <input 
+                type="text" 
+                placeholder="Usuario / Código AMIE" 
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
+                required 
+              />
+              <input 
+                type="password" 
+                placeholder="Contraseña" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
+
+              {/* Mensaje de error visual si falla el login */}
+              {error && <p style={{ color: 'red', fontSize: '13px', margin: '10px 0' }}>{error}</p>}
+
               <button type="submit" className="confirm-btn">ACCEDER</button>
             </form>
             
