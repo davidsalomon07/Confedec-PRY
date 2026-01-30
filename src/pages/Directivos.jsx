@@ -39,6 +39,29 @@ function Directivo() {
     setIsLocked(true);
   };
 
+  // --- ARRAY DE DIRECTIVOS PARA EL CARRUSEL ---
+  const directivos = [
+  { titulo: "DIRECTOR GENERAL", nombre: dirNombre, cedula: dirCedula, email: dirEmail, telf: dirTelf, foto: dirPhoto || placeholderPhoto,
+    setNombre: setDirNombre, setCedula: setDirCedula, setEmail: setDirEmail, setTelf: setDirTelf, setFoto: setDirPhoto },
+  { titulo: "RECTOR(A)", nombre: rectNombre, cedula: rectCedula, email: rectEmail, telf: rectTelf, foto: rectPhoto || placeholderPhoto,
+    setNombre: setRectNombre, setCedula: setRectCedula, setEmail: setRectEmail, setTelf: setRectTelf, setFoto: setRectPhoto },
+  { titulo: "VICERRECTOR(A)", nombre: viceNombre, cedula: viceCedula, email: viceEmail, telf: viceTelf, foto: vicePhoto || placeholderPhoto,
+    setNombre: setViceNombre, setCedula: setViceCedula, setEmail: setViceEmail, setTelf: setViceTelf, setFoto: setVicePhoto },
+  { titulo: "SECRETARÍA", nombre: secNombre, cedula: secCedula, email: secEmail, telf: secTelf, foto: secPhoto || placeholderPhoto,
+    setNombre: setSecNombre, setCedula: setSecCedula, setEmail: setSecEmail, setTelf: setSecTelf, setFoto: setSecPhoto }
+  ];
+
+  // --- CARRUSEL AUTOMÁTICO ---
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+    setIndex((prevIndex) => (prevIndex + 1) % directivos.length);
+    }, 10000); // cada 10 segundos
+    return () => clearInterval(interval);
+  }, []);
+
+  const current = directivos[index];
+
   // Ícono de Usuario (SVG)
   const UserIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -75,112 +98,40 @@ function Directivo() {
           </div>
         )}
 
-        {/* GRID DE TARJETAS CON FOTOS */}
-        <div className="directivos-grid-container">
-          
-          {/* TARJETA 1: DIRECTOR */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><UserIcon /></div>
-              <h3 className="card-title">DIRECTOR GENERAL</h3>
-            </div>
-            
-            <div className="card-content-flex">
-              {/* SECCIÓN FOTO */}
-              <div className="card-photo-section">
-                <img src={dirPhoto || placeholderPhoto} alt="Director" className="directivo-photo" />
-                {!isLocked && (
-                  <input type="text" className="data-input photo-url-input" placeholder="URL Foto..." value={dirPhoto} onChange={(e) => setDirPhoto(e.target.value)} />
-                )}
-              </div>
+        {/* CARD EN CARRUSEL */}
+<div className="directivo-card">
+  <div className="card-header">
+    <div className="icon-circle"><UserIcon /></div>
+    <h3 className="card-title">{current.titulo}</h3>
+  </div>
 
-              {/* SECCIÓN DATOS */}
-              <div className="card-body-data">
-                <label style={labelStyle}>NOMBRES COMPLETOS</label>
-                <input type="text" className="data-input" value={dirNombre} onChange={(e) => setDirNombre(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>CÉDULA</label>
-                <input type="text" className="data-input" value={dirCedula} onChange={(e) => setDirCedula(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>EMAIL</label>
-                <input type="email" className="data-input" value={dirEmail} onChange={(e) => setDirEmail(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>TELÉFONO</label>
-                <input type="tel" className="data-input" value={dirTelf} onChange={(e) => setDirTelf(e.target.value)} disabled={isLocked} />
-              </div>
-            </div>
-          </div>
+  <div className="card-content-flex">
+    {/* Foto */}
+    <div className="card-photo-section">
+      <img src={current.foto} alt={current.titulo} className="directivo-photo" />
+      {!isLocked && (
+        <input type="text" className="data-input photo-url-input" placeholder="URL Foto..."
+          value={current.foto} onChange={(e) => current.setFoto(e.target.value)} />
+      )}
+    </div>
 
-          {/* TARJETA 2: RECTORADO */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><UserIcon /></div>
-              <h3 className="card-title">RECTOR(A)</h3>
-            </div>
-            <div className="card-content-flex">
-              <div className="card-photo-section">
-                <img src={rectPhoto || placeholderPhoto} alt="Rector" className="directivo-photo" />
-                {!isLocked && ( <input type="text" className="data-input photo-url-input" placeholder="URL Foto..." value={rectPhoto} onChange={(e) => setRectPhoto(e.target.value)} /> )}
-              </div>
-              <div className="card-body-data">
-                <label style={labelStyle}>NOMBRES COMPLETOS</label>
-                <input type="text" className="data-input" value={rectNombre} onChange={(e) => setRectNombre(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>CÉDULA</label>
-                <input type="text" className="data-input" value={rectCedula} onChange={(e) => setRectCedula(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>EMAIL</label>
-                <input type="email" className="data-input" value={rectEmail} onChange={(e) => setRectEmail(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>TELÉFONO</label>
-                <input type="tel" className="data-input" value={rectTelf} onChange={(e) => setRectTelf(e.target.value)} disabled={isLocked} />
-              </div>
-            </div>
-          </div>
-
-          {/* TARJETA 3: VICERRECTORADO */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><UserIcon /></div>
-              <h3 className="card-title">VICERRECTOR(A)</h3>
-            </div>
-            <div className="card-content-flex">
-              <div className="card-photo-section">
-                <img src={vicePhoto || placeholderPhoto} alt="Vicerrector" className="directivo-photo" />
-                {!isLocked && ( <input type="text" className="data-input photo-url-input" placeholder="URL Foto..." value={vicePhoto} onChange={(e) => setVicePhoto(e.target.value)} /> )}
-              </div>
-              <div className="card-body-data">
-                <label style={labelStyle}>NOMBRES COMPLETOS</label>
-                <input type="text" className="data-input" value={viceNombre} onChange={(e) => setViceNombre(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>CÉDULA</label>
-                <input type="text" className="data-input" value={viceCedula} onChange={(e) => setViceCedula(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>EMAIL</label>
-                <input type="email" className="data-input" value={viceEmail} onChange={(e) => setViceEmail(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>TELÉFONO</label>
-                <input type="tel" className="data-input" value={viceTelf} onChange={(e) => setViceTelf(e.target.value)} disabled={isLocked} />
-              </div>
-            </div>
-          </div>
-
-          {/* TARJETA 4: SECRETARÍA */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><UserIcon /></div>
-              <h3 className="card-title">SECRETARÍA</h3>
-            </div>
-            <div className="card-content-flex">
-              <div className="card-photo-section">
-                <img src={secPhoto || placeholderPhoto} alt="Secretaría" className="directivo-photo" />
-                {!isLocked && ( <input type="text" className="data-input photo-url-input" placeholder="URL Foto..." value={secPhoto} onChange={(e) => setSecPhoto(e.target.value)} /> )}
-              </div>
-              <div className="card-body-data">
-                <label style={labelStyle}>NOMBRES COMPLETOS</label>
-                <input type="text" className="data-input" value={secNombre} onChange={(e) => setSecNombre(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>CÉDULA</label>
-                <input type="text" className="data-input" value={secCedula} onChange={(e) => setSecCedula(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>EMAIL</label>
-                <input type="email" className="data-input" value={secEmail} onChange={(e) => setSecEmail(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>TELÉFONO</label>
-                <input type="tel" className="data-input" value={secTelf} onChange={(e) => setSecTelf(e.target.value)} disabled={isLocked} />
-              </div>
-            </div>
-          </div>
-
-        </div>
+    {/* Datos */}
+    <div className="card-body-data">
+      <label style={labelStyle}>NOMBRES COMPLETOS</label>
+      <input type="text" className="data-input" value={current.nombre}
+        onChange={(e) => current.setNombre(e.target.value)} disabled={isLocked} />
+      <label style={labelStyle}>CÉDULA</label>
+      <input type="text" className="data-input" value={current.cedula}
+        onChange={(e) => current.setCedula(e.target.value)} disabled={isLocked} />
+      <label style={labelStyle}>EMAIL</label>
+      <input type="email" className="data-input" value={current.email}
+        onChange={(e) => current.setEmail(e.target.value)} disabled={isLocked} />
+      <label style={labelStyle}>TELÉFONO</label>
+      <input type="tel" className="data-input" value={current.telf}
+        onChange={(e) => current.setTelf(e.target.value)} disabled={isLocked} />
+    </div>
+  </div>
+</div>
 
         <div style={{ maxWidth: '400px', margin: '0 auto 40px auto', padding: '0 20px' }}>
           <button className="update-data-btn" disabled={isLocked} onClick={handleUpdate} style={{ opacity: isLocked ? 0.5 : 1 }}>GUARDAR TODOS LOS CAMBIOS</button>

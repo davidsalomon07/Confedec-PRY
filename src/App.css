@@ -373,6 +373,126 @@ h3 {
   }
 }
 
+/* === Estilos específicos para el carrusel de Directivos === */
+
+/* Contenedor principal de la card */
+.directivo-card {
+  max-width: 900px;
+  margin: 0 auto 40px auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  padding: 20px;
+  transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Animación de entrada/salida */
+.directivo-card.fade-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.directivo-card.fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.directivo-card.fade-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+.directivo-card.fade-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* Header de la card */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #3c096c;
+}
+
+/* Icono circular */
+.icon-circle {
+  background: #00d2d3;
+  color: white;
+  border-radius: 50%;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sección de contenido */
+.card-content-flex {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.card-photo-section {
+  flex: 1;
+  text-align: center;
+}
+
+.directivo-photo {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #00d2d3;
+  margin-bottom: 10px;
+  transition: transform 0.5s ease;
+}
+
+.directivo-photo:hover {
+  transform: scale(1.05);
+}
+
+.card-body-data {
+  flex: 2;
+}
+
+/* Inputs */
+.data-input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.data-input:focus {
+  border-color: #00d2d3;
+  outline: none;
+}
+
+/* Botón de guardar */
+.update-data-btn {
+  width: 100%;
+  padding: 12px;
+  background: #00d2d3;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.update-data-btn:hover:enabled {
+  background: #009fa0;
+}
+
 /* --- SECCIÓN UBICACIÓN MEJORADA --- */
 .ubicacion-section {
   background-color: var(--bg-dark);
