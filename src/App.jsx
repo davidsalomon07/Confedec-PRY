@@ -11,7 +11,7 @@ function App() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  // 1. Función para el Scroll Suave (Faltaba esto)
+  // 1. Función para el Scroll Suave
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -19,13 +19,13 @@ function App() {
     }
   };
 
-  // 2. Función del Login (MODIFICADA PARA CONECTAR AL BACKEND)
+  // 2. Función del Login (CORREGIDA PARA QUE CONECTE CON CONSULTAS)
   const handleLogin = async (e) => {
     e.preventDefault(); 
     setError(''); 
 
     try {
-      // Petición al servidor local de Node.js que configuramos
+      // Petición al servidor local
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -35,15 +35,25 @@ function App() {
       const data = await response.json();
 
       if (response.ok) {
-        // --- GUARDAMOS LOS DATOS DE LA BD PARA QUE SE REFLEJEN EN EL PERFIL ---
-        localStorage.setItem('user_data', JSON.stringify(data.user)); 
+        // --- AQUÍ ESTABA EL DETALLE: CAMBIAMOS 'user_data' POR 'user' ---
+        // Esto es vital para que Consultas.jsx encuentre los datos
+        localStorage.setItem('user', JSON.stringify(data.user)); 
         
         setShowLogin(false); 
-        navigate('/perfil');
+
+        // --- REDIRECCIÓN INTELIGENTE ---
+        // Si es la Federación, vamos directo a ver los datos. Si no, al perfil.
+        if (data.user.amie === 'FEDERACION') {
+            navigate('/consultas');
+        } else {
+            navigate('/perfil');
+        }
+
       } else {
         setError(data.error || 'Credenciales incorrectas');
       }
     } catch (err) {
+      console.error(err);
       setError('Error al conectar con el servidor. ¿Está encendido el backend?');
     }
   };
@@ -214,7 +224,7 @@ function App() {
         <div className="social-links">Facebook | Instagram | Twitter</div>
       </footer>
 
-      {/* --- MODAL LOGIN CORREGIDO --- */}
+      {/* --- MODAL LOGIN --- */}
       {showLogin && (
         <div className="modal-overlay">
           <div className="modal-box">
@@ -238,7 +248,6 @@ function App() {
                 required 
               />
 
-              {/* Mensaje de error visual si falla el login */}
               {error && <p style={{ color: 'red', fontSize: '13px', margin: '10px 0' }}>{error}</p>}
 
               <button type="submit" className="confirm-btn">ACCEDER</button>

@@ -12,56 +12,96 @@ function Consultas() {
   const [filterLevel, setFilterLevel] = useState('all');
   const [filterGender, setFilterGender] = useState('all');
 
-  useEffect(() => {
-    const mockData = [
-      { curso: "Maternal Hombres", estudiantes: 5, nivel: "maternal", genero: "hombres" },
-      { curso: "Maternal Mujeres", estudiantes: 5, nivel: "maternal", genero: "mujeres" },
-      { curso: "Inicial 1 Hombres", estudiantes: 11, nivel: "inicial", genero: "hombres" },
-      { curso: "Inicial 1 Mujeres", estudiantes: 8, nivel: "inicial", genero: "mujeres" },
-      { curso: "Inicial 2 Hombres", estudiantes: 9, nivel: "inicial", genero: "hombres" },
-      { curso: "Inicial 2 Mujeres", estudiantes: 17, nivel: "inicial", genero: "mujeres" },
-      { curso: "1 EGB-E Hombres", estudiantes: 18, nivel: "egb", genero: "hombres" },
-      { curso: "1 EGB-E Mujeres", estudiantes: 20, nivel: "egb", genero: "mujeres" },
-      { curso: "2 EGB-E Hombres", estudiantes: 21, nivel: "egb", genero: "hombres" },
-      { curso: "2 EGB-E Mujeres", estudiantes: 24, nivel: "egb", genero: "mujeres" },
-      { curso: "3 EGB-E Hombres", estudiantes: 21, nivel: "egb", genero: "hombres" },
-      { curso: "3 EGB-E Mujeres", estudiantes: 12, nivel: "egb", genero: "mujeres" },
-      { curso: "4 EGB-E Hombres", estudiantes: 32, nivel: "egb", genero: "hombres" },
-      { curso: "4 EGB-E Mujeres", estudiantes: 30, nivel: "egb", genero: "mujeres" },
-      { curso: "5 EGB-E Hombres", estudiantes: 21, nivel: "egb", genero: "hombres" },
-      { curso: "5 EGB-E Mujeres", estudiantes: 16, nivel: "egb", genero: "mujeres" },
-      { curso: "6 EGB-E Hombres", estudiantes: 24, nivel: "egb", genero: "hombres" },
-      { curso: "6 EGB-E Mujeres", estudiantes: 20, nivel: "egb", genero: "mujeres" },
-      { curso: "7 EGB-E Hombres", estudiantes: 13, nivel: "egb", genero: "hombres" },
-      { curso: "7 EGB-E Mujeres", estudiantes: 11, nivel: "egb", genero: "mujeres" },
-      { curso: "8 EGB-E Hombres", estudiantes: 16, nivel: "egb", genero: "hombres" },
-      { curso: "8 EGB-E Mujeres", estudiantes: 9, nivel: "egb", genero: "mujeres" },
-      { curso: "9 EGB-E Hombres", estudiantes: 12, nivel: "egb", genero: "hombres" },
-      { curso: "9 EGB-E Mujeres", estudiantes: 12, nivel: "egb", genero: "mujeres" },
-      { curso: "10 EGB-E Hombres", estudiantes: 13, nivel: "egb", genero: "hombres" },
-      { curso: "10 EGB-E Mujeres", estudiantes: 15, nivel: "egb", genero: "mujeres" },
-      { curso: "1 BGU Hombres", estudiantes: 0, nivel: "bgu", genero: "hombres" },
-      { curso: "1 BGU Mujeres", estudiantes: 11, nivel: "bgu", genero: "mujeres" },
-      { curso: "2 BGU Hombres", estudiantes: 11, nivel: "bgu", genero: "hombres" },
-      { curso: "2 BGU Mujeres", estudiantes: 10, nivel: "bgu", genero: "mujeres" },
-      { curso: "3 BGU Hombres", estudiantes: 15, nivel: "bgu", genero: "hombres" },
-      { curso: "3 BGU Mujeres", estudiantes: 14, nivel: "bgu", genero: "mujeres" },
-      { curso: "1 BTP Hombres", estudiantes: 18, nivel: "btp", genero: "hombres" },
-      { curso: "1 BTP Mujeres", estudiantes: 8, nivel: "btp", genero: "mujeres" },
-      { curso: "2 BTP Hombres", estudiantes: 12, nivel: "btp", genero: "hombres" },
-      { curso: "2 BTP Mujeres", estudiantes: 7, nivel: "btp", genero: "mujeres" },
-      { curso: "3 BTP Hombres", estudiantes: 6, nivel: "btp", genero: "hombres" },
-      { curso: "3 BTP Mujeres", estudiantes: 10, nivel: "btp", genero: "mujeres" },
-    ];
+  // --- NUEVO: ESTADO PARA SABER SI ES LA FEDERACIÓN ---
+  const [isFederacion, setIsFederacion] = useState(false);
+  // ----------------------------------------------------
 
-    const dataConEstudiantes = mockData.filter(item => item.estudiantes > 0);
-    setData(mockData);
-    setFilteredData(dataConEstudiantes);
+  useEffect(() => {
+    // 1. VERIFICAMOS QUIÉN ESTÁ LOGUEADO
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    
+    if (storedUser && storedUser.amie === 'FEDERACION') {
+        // --- CASO 1: ES LA FEDERACIÓN (Cargamos de la Base de Datos) ---
+        setIsFederacion(true);
+        setViewMode('table'); // Forzamos vista de tabla
+
+        fetch('http://localhost:5000/instituciones')
+            .then(res => res.json())
+            .then(dbData => {
+                setData(dbData);
+                setFilteredData(dbData);
+            })
+            .catch(err => console.error("Error cargando instituciones:", err));
+
+    } else {
+        // --- CASO 2: ES UN COLEGIO NORMAL (Tu código original con MockData) ---
+        const mockData = [
+            { curso: "Maternal Hombres", estudiantes: 5, nivel: "maternal", genero: "hombres" },
+            { curso: "Maternal Mujeres", estudiantes: 5, nivel: "maternal", genero: "mujeres" },
+            { curso: "Inicial 1 Hombres", estudiantes: 11, nivel: "inicial", genero: "hombres" },
+            { curso: "Inicial 1 Mujeres", estudiantes: 8, nivel: "inicial", genero: "mujeres" },
+            { curso: "Inicial 2 Hombres", estudiantes: 9, nivel: "inicial", genero: "hombres" },
+            { curso: "Inicial 2 Mujeres", estudiantes: 17, nivel: "inicial", genero: "mujeres" },
+            { curso: "1 EGB-E Hombres", estudiantes: 18, nivel: "egb", genero: "hombres" },
+            { curso: "1 EGB-E Mujeres", estudiantes: 20, nivel: "egb", genero: "mujeres" },
+            { curso: "2 EGB-E Hombres", estudiantes: 21, nivel: "egb", genero: "hombres" },
+            { curso: "2 EGB-E Mujeres", estudiantes: 24, nivel: "egb", genero: "mujeres" },
+            { curso: "3 EGB-E Hombres", estudiantes: 21, nivel: "egb", genero: "hombres" },
+            { curso: "3 EGB-E Mujeres", estudiantes: 12, nivel: "egb", genero: "mujeres" },
+            { curso: "4 EGB-E Hombres", estudiantes: 32, nivel: "egb", genero: "hombres" },
+            { curso: "4 EGB-E Mujeres", estudiantes: 30, nivel: "egb", genero: "mujeres" },
+            { curso: "5 EGB-E Hombres", estudiantes: 21, nivel: "egb", genero: "hombres" },
+            { curso: "5 EGB-E Mujeres", estudiantes: 16, nivel: "egb", genero: "mujeres" },
+            { curso: "6 EGB-E Hombres", estudiantes: 24, nivel: "egb", genero: "hombres" },
+            { curso: "6 EGB-E Mujeres", estudiantes: 20, nivel: "egb", genero: "mujeres" },
+            { curso: "7 EGB-E Hombres", estudiantes: 13, nivel: "egb", genero: "hombres" },
+            { curso: "7 EGB-E Mujeres", estudiantes: 11, nivel: "egb", genero: "mujeres" },
+            { curso: "8 EGB-E Hombres", estudiantes: 16, nivel: "egb", genero: "hombres" },
+            { curso: "8 EGB-E Mujeres", estudiantes: 9, nivel: "egb", genero: "mujeres" },
+            { curso: "9 EGB-E Hombres", estudiantes: 12, nivel: "egb", genero: "hombres" },
+            { curso: "9 EGB-E Mujeres", estudiantes: 12, nivel: "egb", genero: "mujeres" },
+            { curso: "10 EGB-E Hombres", estudiantes: 13, nivel: "egb", genero: "hombres" },
+            { curso: "10 EGB-E Mujeres", estudiantes: 15, nivel: "egb", genero: "mujeres" },
+            { curso: "1 BGU Hombres", estudiantes: 0, nivel: "bgu", genero: "hombres" },
+            { curso: "1 BGU Mujeres", estudiantes: 11, nivel: "bgu", genero: "mujeres" },
+            { curso: "2 BGU Hombres", estudiantes: 11, nivel: "bgu", genero: "hombres" },
+            { curso: "2 BGU Mujeres", estudiantes: 10, nivel: "bgu", genero: "mujeres" },
+            { curso: "3 BGU Hombres", estudiantes: 15, nivel: "bgu", genero: "hombres" },
+            { curso: "3 BGU Mujeres", estudiantes: 14, nivel: "bgu", genero: "mujeres" },
+            { curso: "1 BTP Hombres", estudiantes: 18, nivel: "btp", genero: "hombres" },
+            { curso: "1 BTP Mujeres", estudiantes: 8, nivel: "btp", genero: "mujeres" },
+            { curso: "2 BTP Hombres", estudiantes: 12, nivel: "btp", genero: "hombres" },
+            { curso: "2 BTP Mujeres", estudiantes: 7, nivel: "btp", genero: "mujeres" },
+            { curso: "3 BTP Hombres", estudiantes: 6, nivel: "btp", genero: "hombres" },
+            { curso: "3 BTP Mujeres", estudiantes: 10, nivel: "btp", genero: "mujeres" },
+        ];
+
+        const dataConEstudiantes = mockData.filter(item => item.estudiantes > 0);
+        setData(mockData);
+        setFilteredData(dataConEstudiantes);
+    }
   }, []);
 
   // Filtrado combinado
   useEffect(() => {
     let filtered = [...data];
+
+    // --- LÓGICA DE FILTRADO PARA FEDERACIÓN (Solo busca por nombre o AMIE) ---
+    if (isFederacion) {
+        if (searchTerm.trim()) {
+            const normalizeText = (text) => String(text).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            const normalizedSearch = normalizeText(searchTerm);
+            
+            filtered = filtered.filter(item => 
+                normalizeText(item.nombreInstitucion).includes(normalizedSearch) ||
+                normalizeText(item.amie).includes(normalizedSearch) ||
+                normalizeText(item.Provincia).includes(normalizedSearch)
+            );
+        }
+        setFilteredData(filtered);
+        return; // Terminamos aquí si es federación para no usar filtros de nivel/género
+    }
+    // -------------------------------------------------------------------------
 
     if (filterLevel !== 'all') {
       filtered = filtered.filter(item => item.nivel === filterLevel);
@@ -90,13 +130,40 @@ function Consultas() {
     }
 
     setFilteredData(filtered);
-  }, [searchTerm, data, filterLevel, filterGender]);
+  }, [searchTerm, data, filterLevel, filterGender, isFederacion]); // Agregué isFederacion
 
-  const totalEstudiantes = filteredData.reduce((sum, item) => sum + item.estudiantes, 0);
-  const totalCursos = filteredData.length;
-  const promedioEstudiantes = totalCursos > 0 ? (totalEstudiantes / totalCursos).toFixed(1) : 0;
+  // Cálculos adaptados
+  const totalEstudiantes = isFederacion 
+    ? 0 // Federación no calcula estudiantes por ahora
+    : filteredData.reduce((sum, item) => sum + item.estudiantes, 0);
+
+  const totalCursos = filteredData.length; // Para Federaion esto cuenta Instituciones
+  
+  const promedioEstudiantes = (!isFederacion && totalCursos > 0) 
+    ? (totalEstudiantes / totalCursos).toFixed(1) 
+    : 0;
 
   const exportToCSV = () => {
+    // --- CSV ADAPTADO PARA FEDERACIÓN ---
+    if (isFederacion) {
+        const headers = ['AMIE', 'Institucion', 'Provincia', 'Canton'];
+        const csvContent = [
+            headers.join(','),
+            ...filteredData.map(item => `"${item.amie}","${item.nombreInstitucion}","${item.Provincia}","${item.Canton}"`)
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `instituciones_federacion_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+    }
+    // ------------------------------------
+
     const headers = ['Curso', 'Estudiantes'];
     const csvContent = [
       headers.join(','),
@@ -119,7 +186,7 @@ function Consultas() {
     
     doc.setFontSize(18);
     doc.setTextColor(102, 36, 131);
-    doc.text('CONFEDEC - Estudiantes por Curso', 14, 20);
+    doc.text(isFederacion ? 'Listado de Instituciones - FEDERACION' : 'CONFEDEC - Estudiantes por Curso', 14, 20);
     
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
@@ -127,16 +194,28 @@ function Consultas() {
     
     doc.setFontSize(11);
     doc.setTextColor(60, 60, 60);
-    doc.text(`Total Estudiantes: ${totalEstudiantes}`, 14, 36);
-    doc.text(`Total Cursos: ${totalCursos}`, 14, 42);
-    doc.text(`Promedio: ${promedioEstudiantes} estudiantes/curso`, 14, 48);
 
-    const tableData = filteredData.map(item => [item.curso, item.estudiantes]);
+    if (!isFederacion) {
+        doc.text(`Total Estudiantes: ${totalEstudiantes}`, 14, 36);
+        doc.text(`Promedio: ${promedioEstudiantes} estudiantes/curso`, 14, 48);
+    }
+    doc.text(`Total Registros: ${totalCursos}`, 14, 42);
+
+    // --- PDF ADAPTADO ---
+    let head, body;
+    if (isFederacion) {
+        head = [['AMIE', 'Institución', 'Provincia', 'Cantón']];
+        body = filteredData.map(item => [item.amie, item.nombreInstitucion, item.Provincia, item.Canton]);
+    } else {
+        head = [['Curso', 'Estudiantes']];
+        body = filteredData.map(item => [item.curso, item.estudiantes]);
+    }
+    // --------------------
     
     doc.autoTable({
       startY: 55,
-      head: [['Curso', 'Estudiantes']],
-      body: tableData,
+      head: head,
+      body: body,
       theme: 'grid',
       headStyles: { 
         fillColor: [102, 36, 131],
@@ -156,7 +235,7 @@ function Consultas() {
       }
     });
 
-    doc.save(`estudiantes_confedec_${new Date().toISOString().split('T')[0]}.pdf`);
+    doc.save(`reporte_confedec_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   const COLORS = [
@@ -187,7 +266,8 @@ function Consultas() {
             letterSpacing: '1px',
             textShadow: '0 2px 10px rgba(0,0,0,0.3)'
           }}>
-            Consultas
+            {/* Título dinámico */}
+            {isFederacion ? 'Panel de Federación' : 'Consultas'}
           </h1>
           <p style={{
             color: '#e0aaff',
@@ -195,7 +275,7 @@ function Consultas() {
             fontWeight: '600',
             margin: 0
           }}>
-            Estudiantes por Curso - CONFEDEC
+             {isFederacion ? 'Listado General de Instituciones' : 'Estudiantes por Curso - CONFEDEC'}
           </p>
         </div>
 
@@ -206,7 +286,8 @@ function Consultas() {
           gap: '25px',
           marginBottom: '40px'
         }}>
-          {/* Card 1 - Total Estudiantes */}
+          {/* Card 1 - Total Estudiantes (OCULTA PARA FEDERACIÓN) */}
+          {!isFederacion && (
           <div style={{
             background: '#161616',
             border: '1px solid #333',
@@ -241,8 +322,9 @@ function Consultas() {
               </div>
             </div>
           </div>
+          )}
 
-          {/* Card 2 - Total Cursos */}
+          {/* Card 2 - Total Cursos / Instituciones */}
           <div style={{
             background: '#161616',
             border: '1px solid #333',
@@ -255,7 +337,7 @@ function Consultas() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <p style={{ color: '#b0b0b0', fontSize: '0.85rem', fontWeight: '600', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  Total Cursos
+                  {isFederacion ? 'Instituciones' : 'Total Cursos'}
                 </p>
                 <p style={{ fontSize: '2.5rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>
                   {totalCursos}
@@ -278,7 +360,8 @@ function Consultas() {
             </div>
           </div>
 
-          {/* Card 3 - Promedio */}
+          {/* Card 3 - Promedio (OCULTA PARA FEDERACIÓN) */}
+          {!isFederacion && (
           <div style={{
             background: '#161616',
             border: '1px solid #333',
@@ -313,6 +396,7 @@ function Consultas() {
               </div>
             </div>
           </div>
+          )}
         </div>
 
         {/* PANEL DE CONTROL */}
@@ -339,7 +423,7 @@ function Consultas() {
             </div>
             <input
               type="text"
-              placeholder="Buscar curso por nombre..."
+              placeholder={isFederacion ? "Buscar institución por nombre, AMIE..." : "Buscar curso por nombre..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -391,7 +475,8 @@ function Consultas() {
             alignItems: 'center',
             justifyContent: 'space-between'
           }}>
-            {/* Filtros */}
+            {/* Filtros (SOLO VISIBLES SI NO ES FEDERACIÓN) */}
+            {!isFederacion && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
               <select
                 value={filterLevel}
@@ -442,10 +527,12 @@ function Consultas() {
                 <option value="mujeres">Mujeres</option>
               </select>
             </div>
+            )}
 
             {/* Toggle Vista + Exportar */}
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              {/* Toggle Gráficos/Tabla */}
+              {/* Toggle Gráficos/Tabla (SOLO SI NO ES FEDERACION) */}
+              {!isFederacion && (
               <div style={{
                 background: '#111',
                 borderRadius: '10px',
@@ -500,6 +587,7 @@ function Consultas() {
                   Tabla
                 </button>
               </div>
+              )}
 
               {/* Botón CSV */}
               <button
@@ -574,13 +662,48 @@ function Consultas() {
               No se encontraron resultados
             </h3>
             <p style={{ color: '#888', fontSize: '1rem' }}>
-              No hay cursos que coincidan con los filtros aplicados{searchTerm && `: "${searchTerm}"`}
+              No hay coincidencias con los filtros aplicados{searchTerm && `: "${searchTerm}"`}
             </p>
           </div>
         ) : (
           <>
-            {/* VISTA DE GRÁFICOS */}
-            {viewMode === 'charts' && (
+            {/* ---------------- VISTA TABLA FEDERACIÓN ---------------- */}
+            {isFederacion && viewMode === 'table' && (
+              <div style={{
+                background: '#161616',
+                border: '1px solid #333',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+              }}>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: 'linear-gradient(135deg, #662483, #8e44ad)' }}>
+                        <th style={{ padding: '18px 24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: '800', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '1px' }}>AMIE</th>
+                        <th style={{ padding: '18px 24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: '800', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '1px' }}>Nombre Institución</th>
+                        <th style={{ padding: '18px 24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: '800', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '1px' }}>Provincia</th>
+                        <th style={{ padding: '18px 24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: '800', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '1px' }}>Cantón</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredData.map((item, index) => (
+                        <tr key={index} style={{ borderBottom: '1px solid #222', background: index % 2 === 0 ? '#161616' : '#1a1a1a' }}>
+                           <td style={{ padding: '16px 24px', color: '#e0aaff', fontWeight: 'bold' }}>{item.amie}</td>
+                           <td style={{ padding: '16px 24px', color: '#fff' }}>{item.nombreInstitucion}</td>
+                           <td style={{ padding: '16px 24px', color: '#ccc' }}>{item.Provincia}</td>
+                           <td style={{ padding: '16px 24px', color: '#ccc' }}>{item.Canton}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            {/* -------------------------------------------------------- */}
+
+            {/* VISTA DE GRÁFICOS (SOLO USUARIO NORMAL) */}
+            {!isFederacion && viewMode === 'charts' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
                 {/* Gráfico de Barras */}
                 <div style={{
@@ -713,8 +836,8 @@ function Consultas() {
               </div>
             )}
 
-            {/* VISTA DE TABLA */}
-            {viewMode === 'table' && (
+            {/* VISTA DE TABLA ORIGINAL (SOLO USUARIO NORMAL) */}
+            {!isFederacion && viewMode === 'table' && (
               <div style={{
                 background: '#161616',
                 border: '1px solid #333',

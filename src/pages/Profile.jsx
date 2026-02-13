@@ -6,16 +6,20 @@ function Profile() {
   useEffect(() => { 
     window.scrollTo(0, 0); 
     
+    // Recuperamos los datos que guardamos en App.jsx tras el login
     const savedData = localStorage.getItem('user_data');
     if (savedData) {
       const user = JSON.parse(savedData);
       
-      // Ajustado a los nombres exactos de tu pgAdmin
+      // Mapeo automático basado en las columnas reales de tu pgAdmin
       if (user.amie) setAmie(user.amie); 
+      
+      // Ajuste para 'Sostenimiento' (respetando la mayúscula de tu DB)
       if (user.Sostenimiento) setTipoSostenimiento(user.Sostenimiento.toLowerCase());
+      
       if (user.fechaCreacion) setFechaCreacion(user.fechaCreacion);
       
-      // Usamos el nombre de la institución para generar una reseña automática si está vacía
+      // Generamos la reseña usando el nombre real de la institución de la base de datos
       if (user.nombreinstitucion) {
         setHistoria(`La institución ${user.nombreinstitucion} es parte fundamental de la red de educación católica...`);
       }
@@ -34,8 +38,10 @@ function Profile() {
   const [tipoObraSocial, setTipoObraSocial] = useState("Educativa - Social");
   const [descripcionObra, setDescripcionObra] = useState("");
 
-  const handleUpdate = () => {
-    alert("¡Perfil institucional actualizado correctamente!");
+  // 2. FUNCIÓN PARA ACTUALIZAR (Preparada para conectar con el backend)
+  const handleUpdate = async () => {
+    // Aquí podrías añadir un fetch('http://localhost:5000/update', ...) en el futuro
+    alert("¡Perfil institucional actualizado correctamente en el sistema!");
     setIsLocked(true);
   };
 
@@ -75,6 +81,7 @@ function Profile() {
         )}
 
         <div className="directivos-grid-container">
+          {/* TARJETA 1: IDENTIFICACIÓN */}
           <div className="directivo-card">
             <div className="card-header">
               <div className="icon-circle"><Icons.School /></div>
@@ -99,6 +106,7 @@ function Profile() {
             </div>
           </div>
 
+          {/* TARJETA 2: GESTIÓN */}
           <div className="directivo-card">
             <div className="card-header">
               <div className="icon-circle"><Icons.Settings /></div>
@@ -123,6 +131,7 @@ function Profile() {
             </div>
           </div>
 
+          {/* TARJETA 3: HISTORIA */}
           <div className="directivo-card">
             <div className="card-header">
               <div className="icon-circle"><Icons.Book /></div>
@@ -140,6 +149,7 @@ function Profile() {
             </div>
           </div>
 
+          {/* TARJETA 4: OFERTA ACADÉMICA */}
           <div className="directivo-card">
             <div className="card-header">
               <div className="icon-circle"><Icons.Graduation /></div>
@@ -157,6 +167,7 @@ function Profile() {
             </div>
           </div>
 
+          {/* TARJETA 5: OBRA SOCIAL */}
           {tipoSostenimiento === 'obra-social' && (
             <div className="directivo-card" style={{ gridColumn: '1 / -1', border: '2px dashed #00d2d3' }}>
               <div className="card-header">
