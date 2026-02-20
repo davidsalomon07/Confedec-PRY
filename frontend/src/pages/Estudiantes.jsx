@@ -1,297 +1,217 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Layers, 
+  Users, 
+  Plus, 
+  Minus, 
+  Lock, 
+  Unlock, 
+  GraduationCap,
+  Calculator
+} from 'lucide-react';
 
 function Estudiantes() {
-
   // 1. Scroll al inicio
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // 2. RECIBIMOS EL PODER DEL LAYOUT
-  const [isLocked, setIsLocked] = useOutletContext();
-
-  // 3. ESTADOS
+  // 2. ESTADOS DE DATOS (Mantenidos)
   const [nivel, setNivel] = useState('');
   const [curso, setCurso] = useState('');
-  const [hombres, setHombres] = useState('');
-  const [mujeres, setMujeres] = useState('');
+  const [hombres, setHombres] = useState(0);
+  const [mujeres, setMujeres] = useState(0);
 
-  // 🎯 CURSOS SEGÚN NIVEL
+  // 3. ESTADOS DE BLOQUEO INDIVIDUAL (Candados)
+  const [lockSeleccion, setLockSeleccion] = useState(true);
+  const [lockConteo, setLockConteo] = useState(true);
+
+  // 🎯 CURSOS SEGÚN NIVEL (Tu lógica intacta)
   const cursosPorNivel = {
-    Inicial: ['Inicial 3 años', 'Inicial 4 años'],
-    Preparatoria: ['1° EGB'],
+    'Inicial': ['Inicial 3 años', 'Inicial 4 años'],
+    'Preparatoria': ['1° EGB'],
     'Básica Elemental': ['2° EGB', '3° EGB', '4° EGB'],
     'Básica Media': ['5° EGB', '6° EGB', '7° EGB'],
     'Básica Superior': ['8° EGB', '9° EGB', '10° EGB']
   };
 
-  // 🧼 LIMPIAR CUANDO CAMBIA NIVEL
+  // 🧼 MANEJO DE CAMBIOS (Preservando funcionalidad)
   const handleNivelChange = (e) => {
     setNivel(e.target.value);
     setCurso('');
-    setHombres('');
-    setMujeres('');
+    setHombres(0);
+    setMujeres(0);
   };
 
-  // 🛡️ VALIDACIÓN DE NÚMEROS POSITIVOS (Escritura manual)
-  const handleCantidadChange = (setter) => (e) => {
-    const val = e.target.value;
-    if (val === '' || (!isNaN(val) && Number(val) >= 0)) {
-      setter(val === '' ? '' : Number(val));
-    }
-  };
-
-  // 🕹️ LÓGICA DE BOTONES (+ / -)
   const adjustNumber = (setter, value, delta) => {
-    if (isLocked) return;
-    const currentVal = Number(value) || 0;
-    const newVal = currentVal + delta;
+    const newVal = (Number(value) || 0) + delta;
     setter(newVal < 0 ? 0 : newVal);
   };
 
-  // 🚫 BLOQUEAR TECLA MENOS (-)
-  const preventMinus = (e) => {
-    if (e.key === '-' || e.key === 'e') {
-      e.preventDefault();
-    }
-  };
-
   const handleGuardar = () => {
-    alert('Cambios guardados correctamente');
-    setIsLocked(true); 
+    alert('¡Registro de estudiantes actualizado correctamente!');
+    setLockSeleccion(true);
+    setLockConteo(true);
   };
 
-  // --- ESTILOS ---
+  // --- ESTILOS MEJORADOS PARA VISIBILIDAD ---
+  const inputClass = (locked) => `
+    w-full px-4 py-3 rounded-xl border transition-all duration-300 flex items-center justify-between
+    ${locked 
+      ? 'bg-gray-100 dark:bg-[#0f172a] border-gray-200 dark:border-gray-800 text-gray-500' 
+      : 'bg-white dark:bg-gray-800 border-purple-500 dark:border-purple-400 text-gray-900 dark:text-white shadow-lg shadow-purple-500/10'}
+  `;
 
-  const labelStyle = { 
-    color: '#aaa', 
-    fontSize: '0.75rem', 
-    fontWeight: 'bold', 
-    display: 'block', 
-    marginBottom: '10px', 
-    textTransform: 'uppercase', 
-    textAlign: 'center',
-    letterSpacing: '1px'
-  };
-
-  // Contenedor de controles (Botón - Input - Botón)
-  const inputGroupStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '12px',
-    margin: '0 auto'
-  };
-
-  // Estilo del Input (Caja Oscura con Borde) - IDÉNTICO A PERSONAL
-  const numberInputStyle = { 
-    fontSize: '1.5rem', 
-    textAlign: 'center', 
-    fontWeight: 'bold', 
-    height: '50px',
-    width: '80px',
-    color: '#fff',
-    background: '#050505', 
-    border: '1px solid #333',
-    borderRadius: '8px',
-    padding: '0',
-    outline: 'none'
-  };
-
-  // Íconos SVG
-  const Icons = {
-    Layers: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>,
-    Users: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-  };
-
-  // Color Morado Principal
-  const purpleTheme = '#662483';
+  const labelStyle = "text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 mb-2 flex items-center gap-2";
 
   return (
-    <>
-      {/* CSS LOCAL: Botones Circulares y Input limpio */}
-      <style>{`
-        /* Quitar flechas nativas */
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-
-        /* Botones Circulares Minimalistas */
-        .btn-simple {
-          width: 35px;
-          height: 35px;
-          border-radius: 50%;
-          border: 1px solid #444;
-          background: transparent;
-          color: #888;
-          font-size: 1.2rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        /* Hover Morado */
-        .btn-simple:hover:not(:disabled) {
-          border-color: #662483;
-          background: rgba(102, 36, 131, 0.2);
-          color: white;
-          transform: scale(1.1);
-        }
-
-        .btn-simple:active:not(:disabled) { transform: scale(0.9); }
-        .btn-simple:disabled { opacity: 0.2; cursor: not-allowed; border-color: #333; }
-
-        /* Focus Input */
-        .input-box:focus { border-color: #662483 !important; background: #000 !important; }
-      `}</style>
-
-      {/* 1. BANNER ESTÁNDAR */}
-      <div className="profile-hero-banner" style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '40px 20px' }}>
-        <div className="hero-content" style={{ width: '100%', zIndex: 1 }}>
-          <img src="/confedec.png" alt="Logo" className="hero-logo-large" />
-          <h1>ESTUDIANTES</h1>
-          <p>Gestión de estudiantes por nivel y curso</p>
-        </div>
-
-        {/* BOTÓN DE ACCIÓN (Turquesa Original) */}
-        <div className="hero-action-container" style={{ position: 'absolute', top: '30px', right: '30px', zIndex: 10 }}>
-          <button
-            onClick={() => setIsLocked(!isLocked)}
-            className="banner-action-btn"
-            style={{ backgroundColor: isLocked ? 'rgba(255, 255, 255, 0.2)' : '#00d2d3', color: 'white', border: '1px solid rgba(255,255,255,0.4)', padding: '10px 20px', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s ease', backdropFilter: 'blur(5px)' }}
-          >
-            {isLocked ? (<><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>EDITAR ESTUDIANTES</>) : (<><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>CANCELAR</>)}
-          </button>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-6xl mx-auto pb-20 px-4"
+    >
+      {/* --- BANNER PRINCIPAL --- */}
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#240b36] to-[#c31432] shadow-2xl mb-12 p-10 text-center">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative z-10 text-white">
+          <img src="/confedec.png" alt="Logo" className="w-24 h-24 mx-auto mb-4 drop-shadow-xl" />
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase italic">Control de Estudiantes</h1>
+          <p className="text-purple-100 font-medium tracking-widest text-[10px] mt-2 uppercase">Registro estadístico centralizado</p>
         </div>
       </div>
 
-      {/* 2. CONTENIDO PRINCIPAL */}
-      <main className="profile-data-grid">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         
-        {/* AVISO DE MODO EDICIÓN (Azul/Turquesa Original) */}
-        {!isLocked && (
-          <div style={{ maxWidth: '1200px', width: '95%', margin: '0 auto 20px auto', background: '#e1f5fe', padding: '15px', borderRadius: '8px', borderLeft: '5px solid #00d2d3', color: '#0277bd', textAlign: 'left' }}>
-            <strong>✏️ Editando Estudiantes:</strong> Seleccione el nivel educativo para habilitar el registro.
+        {/* TARJETA 1: SELECCIÓN ACADÉMICA */}
+        <div className="bg-white dark:bg-[#1e293b] p-8 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 relative">
+          <button 
+            onClick={() => setLockSeleccion(!lockSeleccion)} 
+            className="absolute top-8 right-8 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-90"
+          >
+            {lockSeleccion ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-purple-500 animate-pulse" />}
+          </button>
+
+          <div className="flex items-center gap-4 mb-8">
+            <div className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-2xl text-purple-600 dark:text-purple-400"><Layers size={24}/></div>
+            <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">Selección</h3>
           </div>
-        )}
 
-        {/* ⚡ GRID FLEXIBLE ⚡ */}
-        <div className="directivos-grid-container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '30px' }}>
-
-          {/* TARJETA 1: SELECCIÓN */}
-          <div className="directivo-card" style={{ flex: '1 1 400px', maxWidth: '600px', width: '100%' }}>
-            <div className="card-header">
-              <div className="icon-circle"><Icons.Layers /></div>
-              <h3 className="card-title">SELECCIÓN ACADÉMICA</h3>
+          <div className="space-y-6">
+            <div>
+              <label className={labelStyle}>Nivel Educativo</label>
+              <div className={inputClass(lockSeleccion)}>
+                <select 
+                  className="bg-transparent outline-none w-full text-sm disabled:cursor-default dark:text-white" 
+                  value={nivel} 
+                  onChange={handleNivelChange} 
+                  disabled={lockSeleccion}
+                >
+                  <option value="" className="dark:bg-[#1e293b]">- Seleccione nivel -</option>
+                  {Object.keys(cursosPorNivel).map(n => (
+                    <option key={n} value={n} className="dark:bg-[#1e293b] text-black dark:text-white">{n}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div className="card-body">
-              <label style={{...labelStyle, textAlign: 'left'}}>NIVEL DE EDUCACIÓN</label>
-              <select className="data-select" value={nivel} onChange={handleNivelChange} disabled={isLocked}>
-                <option value="">- Seleccione un nivel -</option>
-                <option>Inicial</option>
-                <option>Preparatoria</option>
-                <option>Básica Elemental</option>
-                <option>Básica Media</option>
-                <option>Básica Superior</option>
-              </select>
 
+            <AnimatePresence>
               {nivel && (
-                <div style={{ marginTop: '20px', animation: 'fadeIn 0.5s' }}>
-                  <label style={{...labelStyle, textAlign: 'left'}}>CURSO / GRADO</label>
-                  <select className="data-select" value={curso} onChange={(e) => setCurso(e.target.value)} disabled={isLocked}>
-                    <option value="">- Seleccione un curso -</option>
-                    {cursosPorNivel[nivel].map((c) => (
-                      <option key={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
+                <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
+                  <label className={labelStyle}>Curso / Grado</label>
+                  <div className={inputClass(lockSeleccion)}>
+                    <select 
+                      className="bg-transparent outline-none w-full text-sm dark:text-white" 
+                      value={curso} 
+                      onChange={(e) => setCurso(e.target.value)} 
+                      disabled={lockSeleccion}
+                    >
+                      <option value="" className="dark:bg-[#1e293b]">- Seleccione curso -</option>
+                      {cursosPorNivel[nivel].map(c => (
+                        <option key={c} value={c} className="dark:bg-[#1e293b] text-black dark:text-white">{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
           </div>
-
-          {/* TARJETA 2: REGISTRO (CON CONTROLES + / -) */}
-          {curso && (
-            <div className="directivo-card" style={{ flex: '1 1 400px', maxWidth: '600px', width: '100%', animation: 'fadeIn 0.5s' }}>
-              <div className="card-header">
-                <div className="icon-circle" style={{ background: `linear-gradient(135deg, ${purpleTheme} 0%, #3c096c 100%)` }}><Icons.Users /></div>
-                <h3 className="card-title">CANTIDAD DE ESTUDIANTES</h3>
-              </div>
-              <div className="card-body">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                  
-                  {/* COLUMNA HOMBRES */}
-                  <div>
-                    <label style={labelStyle}>HOMBRES</label>
-                    <div style={inputGroupStyle}>
-                      <button className="btn-simple" onClick={() => adjustNumber(setHombres, hombres, -1)} disabled={isLocked}>-</button>
-                      <input 
-                        type="number" 
-                        className="input-box" 
-                        value={hombres} 
-                        onChange={handleCantidadChange(setHombres)} 
-                        onKeyDown={preventMinus} 
-                        disabled={isLocked} 
-                        placeholder="0" 
-                        style={numberInputStyle}
-                      />
-                      <button className="btn-simple" onClick={() => adjustNumber(setHombres, hombres, 1)} disabled={isLocked}>+</button>
-                    </div>
-                  </div>
-
-                  {/* COLUMNA MUJERES */}
-                  <div>
-                    <label style={labelStyle}>MUJERES</label>
-                    <div style={inputGroupStyle}>
-                      <button className="btn-simple" onClick={() => adjustNumber(setMujeres, mujeres, -1)} disabled={isLocked}>-</button>
-                      <input 
-                        type="number" 
-                        className="input-box" 
-                        value={mujeres} 
-                        onChange={handleCantidadChange(setMujeres)} 
-                        onKeyDown={preventMinus} 
-                        disabled={isLocked} 
-                        placeholder="0" 
-                        style={numberInputStyle}
-                      />
-                      <button className="btn-simple" onClick={() => adjustNumber(setMujeres, mujeres, 1)} disabled={isLocked}>+</button>
-                    </div>
-                  </div>
-
-                </div>
-                
-                {/* Resumen Total */}
-                <div style={{ marginTop: '20px', padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', textAlign: 'center' }}>
-                  <span style={{ color: '#888', fontSize: '0.8rem' }}>TOTAL ESTUDIANTES EN ESTE CURSO</span>
-                  <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#fff' }}>
-                    {(Number(hombres) || 0) + (Number(mujeres) || 0)}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
         </div>
 
-        {/* BOTÓN GUARDAR (Morado) */}
-        {curso && (
-          <div style={{ maxWidth: '400px', margin: '40px auto', padding: '0 20px', animation: 'fadeIn 0.5s' }}>
-            <button className="update-data-btn" disabled={isLocked} onClick={handleGuardar} style={{ opacity: isLocked ? 0.5 : 1 }}>
-              GUARDAR CAMBIOS
+        {/* TARJETA 2: CONTEO (Se activa al elegir curso) */}
+        <AnimatePresence>
+          {curso && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white dark:bg-[#1e293b] p-8 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 relative"
+            >
+              <button 
+                onClick={() => setLockConteo(!lockConteo)} 
+                className="absolute top-8 right-8 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-90"
+              >
+                {lockConteo ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-purple-500 animate-pulse" />}
+              </button>
+
+              <div className="flex items-center gap-4 mb-8">
+                <div className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-2xl text-purple-600 dark:text-purple-400"><Users size={24}/></div>
+                <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">Población</h3>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                {/* HOMBRES */}
+                <div className="p-4 bg-gray-50 dark:bg-[#0f172a] rounded-3xl border border-gray-100 dark:border-gray-800 text-center">
+                  <label className={labelStyle}>Hombres</label>
+                  <div className="flex items-center justify-center gap-6 mt-2">
+                    <button onClick={() => adjustNumber(setHombres, hombres, -1)} disabled={lockConteo} className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-purple-600 hover:text-white disabled:opacity-20 transition-all"><Minus size={18} /></button>
+                    <span className="text-4xl font-black dark:text-white w-16">{hombres}</span>
+                    <button onClick={() => adjustNumber(setHombres, hombres, 1)} disabled={lockConteo} className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-purple-600 hover:text-white disabled:opacity-20 transition-all"><Plus size={18} /></button>
+                  </div>
+                </div>
+
+                {/* MUJERES */}
+                <div className="p-4 bg-gray-50 dark:bg-[#0f172a] rounded-3xl border border-gray-100 dark:border-gray-800 text-center">
+                  <label className={labelStyle}>Mujeres</label>
+                  <div className="flex items-center justify-center gap-6 mt-2">
+                    <button onClick={() => adjustNumber(setMujeres, mujeres, -1)} disabled={lockConteo} className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-purple-600 hover:text-white disabled:opacity-20 transition-all"><Minus size={18} /></button>
+                    <span className="text-4xl font-black dark:text-white w-16">{mujeres}</span>
+                    <button onClick={() => adjustNumber(setMujeres, mujeres, 1)} disabled={lockConteo} className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-purple-600 hover:text-white disabled:opacity-20 transition-all"><Plus size={18} /></button>
+                  </div>
+                </div>
+
+                {/* TOTAL */}
+                <div className="mt-2 p-6 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-3xl text-center shadow-lg">
+                  <p className="text-purple-100 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Total Matriculados</p>
+                  <div className="flex items-center justify-center gap-3 text-white">
+                    <Calculator size={20} className="opacity-50" />
+                    <span className="text-4xl font-black tracking-tighter">{(Number(hombres) || 0) + (Number(mujeres) || 0)}</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* BOTÓN GUARDAR */}
+      <AnimatePresence>
+        {(!lockSeleccion || !lockConteo) && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-10 left-0 right-0 z-50 flex justify-center px-4"
+          >
+            <button 
+              onClick={handleGuardar}
+              className="px-12 py-4 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl shadow-2xl transform transition-all active:scale-95 flex items-center gap-3"
+            >
+              <GraduationCap size={20} /> ACTUALIZAR REGISTRO ACADÉMICO
             </button>
-          </div>
+          </motion.div>
         )}
+      </AnimatePresence>
 
-      </main>
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-    </>
+    </motion.div>
   );
 }
 

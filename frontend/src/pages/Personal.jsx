@@ -1,17 +1,24 @@
 import { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Lock, 
+  Unlock, 
+  Plus, 
+  Minus, 
+  Briefcase, 
+  UserCheck, 
+  Wrench, 
+  Building,
+  Users,
+  Save,
+  Calculator
+} from 'lucide-react';
 
 function Personal() {
-
   // 1. Scroll al inicio
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
-  // 2. RECIBIMOS EL PODER DEL LAYOUT
-  const [isLocked, setIsLocked] = useOutletContext();
-
-  // 3. Estados para los datos del Personal
+  // 2. ESTADOS DE DATOS (Mantenidos)
   const [formData, setFormData] = useState({
     docentesParticulares: 0,
     adminParticulares: 0,
@@ -20,7 +27,11 @@ function Personal() {
     adminFiscales: 0
   });
 
-  // Manejador genérico
+  // 3. ESTADOS DE BLOQUEO INDIVIDUAL (Candados)
+  const [lockParticular, setLockParticular] = useState(true);
+  const [lockFiscal, setLockFiscal] = useState(true);
+
+  // Manejador genérico (Preservando funcionalidad)
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (value === '' || (!isNaN(value) && Number(value) >= 0)) {
@@ -29,8 +40,8 @@ function Personal() {
   };
 
   // 🕹️ LÓGICA DE BOTONES (+ / -)
-  const adjustNumber = (name, delta) => {
-    if (isLocked) return; 
+  const adjustNumber = (name, delta, locked) => {
+    if (locked) return; 
     setFormData(prev => {
       const currentVal = Number(prev[name]) || 0;
       const newVal = currentVal + delta;
@@ -39,222 +50,174 @@ function Personal() {
   };
 
   const handleGuardar = () => {
-    alert('Información del personal actualizada correctamente.');
-    setIsLocked(true); 
+    alert('¡Información del personal actualizada correctamente!');
+    setLockParticular(true);
+    setLockFiscal(true);
   };
 
-  // --- ESTILOS & ÍCONOS ---
-  
-  const Icons = {
-    Briefcase: () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>,
-    UserCheck: () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>,
-    Tool: () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
-    Gov: () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h16"/><path d="M10 22V9"/><path d="M14 22V9"/><path d="M2 9h20l-10-7-10 7z"/></svg>
-  };
+  const totalPersonal = Object.values(formData).reduce((a, b) => Number(a) + Number(b), 0);
+  const isAnyUnlocked = !lockParticular || !lockFiscal;
 
-  // ESTILOS EN LÍNEA
-  const inputGroupStyle = { 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'flex-end', 
-    gap: '12px' 
-  };
-
-  const numberInputStyle = { 
-    fontSize: '1.2rem', 
-    textAlign: 'center', 
-    fontWeight: 'bold', 
-    height: '45px', 
-    width: '80px', 
-    color: '#fff', 
-    background: '#050505', 
-    border: '1px solid #333', 
-    borderRadius: '8px',
-    outline: 'none',
-    padding: '0'
-  };
-
-  // COLORES DE TEMA
-  const purpleColor = '#662483'; // Morado Confedec
-  const purpleGradient = 'linear-gradient(135deg, #662483 0%, #3c096c 100%)';
+  const cardStyle = "bg-white dark:bg-[#1e293b] p-8 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 relative transition-all duration-300";
+  const labelStyle = "text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1";
+  const rowStyle = "flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-[#0f172a] border border-gray-100 dark:border-gray-800 transition-all";
 
   return (
-    <>
-      {/* CSS LOCAL: Botones Circulares Minimalistas */}
-      <style>{`
-        /* Quitar flechas del input number */
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-
-        /* Botones Circulares */
-        .btn-simple {
-          width: 35px;
-          height: 35px;
-          border-radius: 50%;
-          border: 1px solid #444;
-          background: transparent;
-          color: #888;
-          font-size: 1.2rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .btn-simple:hover:not(:disabled) {
-          border-color: #662483; /* Hover Morado */
-          background: rgba(102, 36, 131, 0.2);
-          color: white;
-          transform: scale(1.1);
-        }
-
-        .btn-simple:active:not(:disabled) { transform: scale(0.9); }
-        .btn-simple:disabled { opacity: 0.2; cursor: not-allowed; border-color: #333; }
-        
-        /* Efecto focus en el input numérico */
-        .data-input-number:focus { border-color: #662483 !important; background: #000 !important; }
-      `}</style>
-
-      {/* 1. BANNER */}
-      <div className="profile-hero-banner" style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '40px 20px' }}>
-        <div className="hero-content" style={{ width: '100%', zIndex: 1 }}>
-          <img src="/confedec.png" alt="Logo" className="hero-logo-large" />
-          <h1>PERSONAL INSTITUCIONAL</h1>
-          <p>Registro de la planta docente, administrativa y de servicio</p>
-        </div>
-        
-        {/* BOTÓN DE ACCIÓN (Mantiene el Celeste/Turquesa original para resaltar la acción) */}
-        <div className="hero-action-container" style={{ position: 'absolute', top: '30px', right: '30px', zIndex: 10 }}>
-          <button onClick={() => setIsLocked(!isLocked)} className="banner-action-btn" style={{ backgroundColor: isLocked ? 'rgba(255, 255, 255, 0.2)' : '#00d2d3', color: 'white', border: '1px solid rgba(255,255,255,0.4)', padding: '10px 20px', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s ease', backdropFilter: 'blur(5px)' }}>
-            {isLocked ? (<><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>EDITAR PERSONAL</>) : (<><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>CANCELAR</>)}
-          </button>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-6xl mx-auto pb-24 px-4"
+    >
+      {/* --- BANNER --- */}
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] shadow-2xl mb-12 p-10 text-center">
+        <div className="absolute inset-0 bg-indigo-500/10 backdrop-blur-[2px]"></div>
+        <div className="relative z-10 text-white">
+          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
+            <img src="/confedec.png" alt="Logo" className="w-24 h-24 mx-auto mb-4 drop-shadow-2xl" />
+          </motion.div>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase italic">Personal Institucional</h1>
+          <p className="text-indigo-200 font-medium tracking-[0.3em] text-[10px] mt-2 uppercase">Registro de Planta Docente y Administrativa</p>
         </div>
       </div>
 
-      {/* 2. CONTENIDO */}
-      <main className="profile-data-grid">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
         
-        {/* ALERTA DE EDICIÓN (Mantiene el Celeste/Azul original) */}
-        {!isLocked && (
-          <div style={{ maxWidth: '1200px', width: '95%', margin: '0 auto 30px auto', background: '#e1f5fe', padding: '15px', borderRadius: '8px', borderLeft: '5px solid #00d2d3', color: '#0277bd', textAlign: 'left' }}>
-            <strong>✏️ Editando Personal:</strong> Actualice las cantidades de docentes y administrativos.
-          </div>
-        )}
-
-        {/* GRID DE TARJETAS */}
-        <div className="directivos-grid-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '40px', justifyContent: 'center' }}>
-
-          {/* TARJETA 1: PERSONAL PARTICULAR (AHORA MORADO) */}
-          <div className="directivo-card">
-            <div className="card-header">
-              {/* CORREGIDO: Gradiente Morado */}
-              <div className="icon-circle" style={{ background: purpleGradient }}><Icons.UserCheck /></div>
-              <h3 className="card-title">PERSONAL PARTICULAR</h3>
-            </div>
-            <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-              
-              {/* Docentes */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #222', paddingBottom: '15px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  {/* CORREGIDO: Color Morado */}
-                  <div style={{ color: purpleColor }}><Icons.Briefcase /></div>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#ccc' }}>DOCENTES</span>
-                </div>
-                <div style={inputGroupStyle}>
-                  <button className="btn-simple" onClick={() => adjustNumber('docentesParticulares', -1)} disabled={isLocked}>-</button>
-                  <input type="number" className="data-input-number" name="docentesParticulares" value={formData.docentesParticulares} onChange={handleChange} disabled={isLocked} style={numberInputStyle} placeholder="0" />
-                  <button className="btn-simple" onClick={() => adjustNumber('docentesParticulares', 1)} disabled={isLocked}>+</button>
-                </div>
-              </div>
-
-              {/* Administrativos */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #222', paddingBottom: '15px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  {/* CORREGIDO: Color Morado */}
-                  <div style={{ color: purpleColor }}><Icons.UserCheck /></div>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#ccc' }}>ADMINISTRATIVOS</span>
-                </div>
-                <div style={inputGroupStyle}>
-                  <button className="btn-simple" onClick={() => adjustNumber('adminParticulares', -1)} disabled={isLocked}>-</button>
-                  <input type="number" className="data-input-number" name="adminParticulares" value={formData.adminParticulares} onChange={handleChange} disabled={isLocked} style={numberInputStyle} placeholder="0" />
-                  <button className="btn-simple" onClick={() => adjustNumber('adminParticulares', 1)} disabled={isLocked}>+</button>
-                </div>
-              </div>
-
-              {/* Servicio */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  {/* CORREGIDO: Color Morado */}
-                  <div style={{ color: purpleColor }}><Icons.Tool /></div>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#ccc' }}>SERVICIO / MANT.</span>
-                </div>
-                <div style={inputGroupStyle}>
-                  <button className="btn-simple" onClick={() => adjustNumber('servicio', -1)} disabled={isLocked}>-</button>
-                  <input type="number" className="data-input-number" name="servicio" value={formData.servicio} onChange={handleChange} disabled={isLocked} style={numberInputStyle} placeholder="0" />
-                  <button className="btn-simple" onClick={() => adjustNumber('servicio', 1)} disabled={isLocked}>+</button>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* TARJETA 2: PERSONAL FISCAL (MORADO) */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle" style={{ background: purpleGradient }}><Icons.Gov /></div>
-              <h3 className="card-title">PERSONAL FISCAL (ASIGNADO)</h3>
-            </div>
-            <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-              
-              {/* Docentes Fiscales */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #222', paddingBottom: '15px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  <div style={{ color: purpleColor }}><Icons.Briefcase /></div>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#ccc' }}>DOCENTES FISCALES</span>
-                </div>
-                <div style={inputGroupStyle}>
-                  <button className="btn-simple" onClick={() => adjustNumber('docentesFiscales', -1)} disabled={isLocked}>-</button>
-                  <input type="number" className="data-input-number" name="docentesFiscales" value={formData.docentesFiscales} onChange={handleChange} disabled={isLocked} style={numberInputStyle} placeholder="0" />
-                  <button className="btn-simple" onClick={() => adjustNumber('docentesFiscales', 1)} disabled={isLocked}>+</button>
-                </div>
-              </div>
-
-              {/* Administrativos Fiscales */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  <div style={{ color: purpleColor }}><Icons.UserCheck /></div>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#ccc' }}>ADMIN. FISCALES</span>
-                </div>
-                <div style={inputGroupStyle}>
-                  <button className="btn-simple" onClick={() => adjustNumber('adminFiscales', -1)} disabled={isLocked}>-</button>
-                  <input type="number" className="data-input-number" name="adminFiscales" value={formData.adminFiscales} onChange={handleChange} disabled={isLocked} style={numberInputStyle} placeholder="0" />
-                  <button className="btn-simple" onClick={() => adjustNumber('adminFiscales', 1)} disabled={isLocked}>+</button>
-                </div>
-              </div>
-
-              {/* Resumen Total */}
-              <div style={{ marginTop: 'auto', padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', textAlign: 'center', border: '1px dashed #444' }}>
-                <span style={{ color: '#888', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px' }}>TOTAL PLANTA DOCENTE Y ADMINISTRATIVA</span>
-                <div style={{ fontSize: '2rem', fontWeight: '900', color: '#fff', marginTop: '5px' }}>
-                  { Object.values(formData).reduce((a, b) => Number(a) + Number(b), 0) }
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-
-        {/* BOTÓN GUARDAR (Morado para acción de guardado) */}
-        <div style={{ maxWidth: '400px', margin: '40px auto', padding: '0 20px' }}>
-          <button className="update-data-btn" disabled={isLocked} onClick={handleGuardar} style={{ opacity: isLocked ? 0.5 : 1 }}>
-            GUARDAR CAMBIOS
+        {/* TARJETA 1: PERSONAL PARTICULAR */}
+        <div className={cardStyle}>
+          <button 
+            onClick={() => setLockParticular(!lockParticular)} 
+            className="absolute top-8 right-8 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+          >
+            {lockParticular ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-purple-500 animate-pulse" />}
           </button>
+
+          <div className="flex items-center gap-4 mb-10">
+            <div className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-2xl text-purple-600 dark:text-purple-400"><UserCheck size={24}/></div>
+            <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">Personal Particular</h3>
+          </div>
+
+          <div className="space-y-4">
+            {/* Docentes Particulares */}
+            <div className={rowStyle}>
+              <div className="flex items-center gap-3">
+                <Briefcase size={18} className="text-purple-500" />
+                <span className="text-xs font-bold dark:text-gray-300">Docentes</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <button onClick={() => adjustNumber('docentesParticulares', -1, lockParticular)} disabled={lockParticular} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-purple-600 hover:text-white transition-all disabled:opacity-20"><Minus size={14} /></button>
+                <span className="text-2xl font-black dark:text-white min-w-[30px] text-center">{formData.docentesParticulares}</span>
+                <button onClick={() => adjustNumber('docentesParticulares', 1, lockParticular)} disabled={lockParticular} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-purple-600 hover:text-white transition-all disabled:opacity-20"><Plus size={14} /></button>
+              </div>
+            </div>
+
+            {/* Admin Particulares */}
+            <div className={rowStyle}>
+              <div className="flex items-center gap-3">
+                <Users size={18} className="text-purple-500" />
+                <span className="text-xs font-bold dark:text-gray-300">Administrativos</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <button onClick={() => adjustNumber('adminParticulares', -1, lockParticular)} disabled={lockParticular} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-purple-600 hover:text-white transition-all disabled:opacity-20"><Minus size={14} /></button>
+                <span className="text-2xl font-black dark:text-white min-w-[30px] text-center">{formData.adminParticulares}</span>
+                <button onClick={() => adjustNumber('adminParticulares', 1, lockParticular)} disabled={lockParticular} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-purple-600 hover:text-white transition-all disabled:opacity-20"><Plus size={14} /></button>
+              </div>
+            </div>
+
+            {/* Servicio */}
+            <div className={rowStyle}>
+              <div className="flex items-center gap-3">
+                <Wrench size={18} className="text-purple-500" />
+                <span className="text-xs font-bold dark:text-gray-300">Servicio / Mant.</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <button onClick={() => adjustNumber('servicio', -1, lockParticular)} disabled={lockParticular} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-purple-600 hover:text-white transition-all disabled:opacity-20"><Minus size={14} /></button>
+                <span className="text-2xl font-black dark:text-white min-w-[30px] text-center">{formData.servicio}</span>
+                <button onClick={() => adjustNumber('servicio', 1, lockParticular)} disabled={lockParticular} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-purple-600 hover:text-white transition-all disabled:opacity-20"><Plus size={14} /></button>
+              </div>
+            </div>
+          </div>
         </div>
 
-      </main>
-    </>
+        {/* TARJETA 2: PERSONAL FISCAL + TOTAL */}
+        <div className="space-y-8 flex flex-col">
+          <div className={`${cardStyle} flex-1`}>
+            <button 
+              onClick={() => setLockFiscal(!lockFiscal)} 
+              className="absolute top-8 right-8 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+            >
+              {lockFiscal ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500 animate-pulse" />}
+            </button>
+
+            <div className="flex items-center gap-4 mb-10">
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl text-indigo-600 dark:text-indigo-400"><Building size={24}/></div>
+              <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">Personal Fiscal</h3>
+            </div>
+
+            <div className="space-y-4">
+              {/* Docentes Fiscales */}
+              <div className={rowStyle}>
+                <div className="flex items-center gap-3">
+                  <Briefcase size={18} className="text-indigo-500" />
+                  <span className="text-xs font-bold dark:text-gray-300">Docentes</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button onClick={() => adjustNumber('docentesFiscales', -1, lockFiscal)} disabled={lockFiscal} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-20"><Minus size={14} /></button>
+                  <span className="text-2xl font-black dark:text-white min-w-[30px] text-center">{formData.docentesFiscales}</span>
+                  <button onClick={() => adjustNumber('docentesFiscales', 1, lockFiscal)} disabled={lockFiscal} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-20"><Plus size={14} /></button>
+                </div>
+              </div>
+
+              {/* Admin Fiscales */}
+              <div className={rowStyle}>
+                <div className="flex items-center gap-3">
+                  <Users size={18} className="text-indigo-500" />
+                  <span className="text-xs font-bold dark:text-gray-300">Administrativos</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button onClick={() => adjustNumber('adminFiscales', -1, lockFiscal)} disabled={lockFiscal} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-20"><Minus size={14} /></button>
+                  <span className="text-2xl font-black dark:text-white min-w-[30px] text-center">{formData.adminFiscales}</span>
+                  <button onClick={() => adjustNumber('adminFiscales', 1, lockFiscal)} disabled={lockFiscal} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-20"><Plus size={14} /></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* TOTAL SUMMARY CARD */}
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-8 rounded-[2.5rem] shadow-2xl text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <Calculator size={80} />
+            </div>
+            <div className="relative z-10">
+              <p className="text-purple-100 text-[10px] font-black uppercase tracking-[0.4em] mb-2">Total Planta Institucional</p>
+              <div className="flex items-center justify-center gap-4 text-white">
+                <span className="text-5xl font-black tracking-tighter">{totalPersonal}</span>
+                <p className="text-xs font-bold text-purple-200 text-left leading-tight">PERSONAS<br/>REGISTRADAS</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- BOTÓN GUARDAR FLOTANTE --- */}
+      <AnimatePresence>
+        {isAnyUnlocked && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-10 left-0 right-0 z-50 flex justify-center px-4"
+          >
+            <button 
+              onClick={handleGuardar}
+              className="px-12 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-2xl shadow-indigo-500/40 transform transition-all active:scale-95 flex items-center gap-3"
+            >
+              <Save size={20} /> GUARDAR NÓMINA DE PERSONAL
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </motion.div>
   );
 }
 

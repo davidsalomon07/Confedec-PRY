@@ -1,7 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Compass, 
+  Map as MapIcon, 
+  MapPin, 
+  Clock, 
+  Lock, 
+  Unlock, 
+  Globe,
+  Navigation
+} from 'lucide-react';
 
-// DATOS DE ECUADOR (Se mantienen intactos para la funcionalidad)
+// DATOS DE ECUADOR (Mantenidos intactos para tu funcionalidad)
 const ecuadorData = {
   "Azuay": ["Cuenca", "Girón", "Gualaceo", "Nabón", "Paute", "Pucará", "San Fernando", "Santa Isabel", "Sigsig", "Oña", "Chordeleg", "El Pan", "Sevilla de Oro", "Guachapala", "Camilo Ponce Enríquez"],
   "Bolívar": ["Guaranda", "Chillanes", "Chimbo", "Echeandía", "San Miguel", "Caluma", "Las Naves"],
@@ -30,168 +40,209 @@ const ecuadorData = {
 };
 
 function Ubicacion() {
-  
   // 1. Scroll al inicio
   useEffect(() => { window.scrollTo(0, 0); }, []);
-
-  // 2. RECIBIMOS EL PODER DEL LAYOUT
-  const [isLocked, setIsLocked] = useOutletContext();
 
   // Form States
   const [provincia, setProvincia] = useState("");
   const [canton, setCanton] = useState("");
   const [zona, setZona] = useState("");
+  const [distrito, setDistrito] = useState("17D05");
+  const [ciudad, setCiudad] = useState("Quito");
+  const [gmaps, setGmaps] = useState("https://goo.gl/maps/example");
+
+  // ESTADOS DE BLOQUEO INDIVIDUAL
+  const [lockZona, setLockZona] = useState(true);
+  const [lockPolitica, setLockPolitica] = useState(true);
+  const [lockExacta, setLockExacta] = useState(true);
+  const [lockJornada, setLockJornada] = useState(true);
 
   const handleUpdate = () => {
-    alert("¡Ubicación actualizada correctamente!");
-    setIsLocked(true); 
+    alert("¡Ubicación institucional actualizada!");
+    setLockZona(true); setLockPolitica(true); setLockExacta(true); setLockJornada(true);
   };
 
-  // Handler jerárquico para cantones (Funcionalidad preservada)
   const handleProvinciaChange = (e) => {
     setProvincia(e.target.value);
-    setCanton(""); // Reset cantón al cambiar provincia
+    setCanton(""); 
   };
 
-  // Íconos SVG Temáticos
-  const Icons = {
-    Compass: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>,
-    Map: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>,
-    Pin: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>,
-    Clock: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-  };
+  const inputClass = (locked) => `
+    w-full px-4 py-3 rounded-xl border transition-all duration-300 flex items-center justify-between
+    ${locked 
+      ? 'bg-gray-100 dark:bg-[#0f172a] border-gray-200 dark:border-gray-800 text-gray-500' 
+      : 'bg-white dark:bg-gray-800 border-indigo-500 dark:border-indigo-400 text-gray-900 dark:text-white shadow-lg shadow-indigo-500/10'}
+  `;
 
-  // Estilo consistente para Labels
-  const labelStyle = { color: '#aaa', fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '5px', textTransform: 'uppercase' };
+  const labelStyle = "text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 mb-2 flex items-center gap-2";
 
   return (
-    <>
-      {/* 1. BANNER ESTILO EXECUTIVE */}
-      <div className="profile-hero-banner" style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '40px 20px' }}>
-        <div className="hero-content" style={{ width: '100%', zIndex: 1 }}>
-          <img src="/confedec.png" alt="Logo" className="hero-logo-large" />
-          <h1>UBICACIÓN GEOGRÁFICA</h1>
-          <p>Gestión de Localización y Zonificación Institucional</p>
-        </div>
-        
-        {/* BOTÓN FLOTANTE */}
-        <div className="hero-action-container" style={{ position: 'absolute', top: '30px', right: '30px', zIndex: 10 }}>
-          <button
-            onClick={() => setIsLocked(!isLocked)}
-            className="banner-action-btn"
-            style={{ backgroundColor: isLocked ? 'rgba(255, 255, 255, 0.2)' : '#00d2d3', color: 'white', border: '1px solid rgba(255,255,255,0.4)', padding: '10px 20px', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s ease', backdropFilter: 'blur(5px)' }}
-          >
-            {isLocked ? (<><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>EDITAR UBICACIÓN</>) : (<><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>CANCELAR</>)}
-          </button>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-6xl mx-auto pb-20 px-4"
+    >
+      {/* --- BANNER PRINCIPAL --- */}
+      <div className="relative overflow-hidden rounded-3xl bg-indigo-700 shadow-2xl mb-12 p-10 text-center">
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="relative z-10">
+          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
+            <img src="/confedec.png" alt="Logo" className="w-24 h-24 mx-auto mb-4 drop-shadow-xl" />
+          </motion.div>
+          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase">Ubicación Geográfica</h1>
+          <p className="text-indigo-100 font-medium tracking-widest text-xs mt-2 uppercase">Gestión de Localización y Zonificación</p>
         </div>
       </div>
 
-      {/* 2. CONTENIDO PRINCIPAL */}
-      <main className="profile-data-grid">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        {/* AVISO DE EDICIÓN */}
-        {!isLocked && (
-          <div style={{ maxWidth: '1200px', width: '95%', margin: '0 auto 20px auto', background: '#e1f5fe', padding: '15px', borderRadius: '8px', borderLeft: '5px solid #00d2d3', color: '#0277bd', textAlign: 'left' }}>
-            <strong>✏️ Editando Ubicación:</strong> Seleccione la zona, provincia y actualice los datos de contacto.
-          </div>
-        )}
+        {/* TARJETA 1: ZONIFICACIÓN */}
+        <div className="bg-white dark:bg-[#1e293b] p-8 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 relative">
+          <button onClick={() => setLockZona(!lockZona)} className="absolute top-8 right-8 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            {lockZona ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500 animate-pulse" />}
+          </button>
 
-        {/* ⚡ GRID DE TARJETAS EJECUTIVAS ⚡ */}
-        <div className="directivos-grid-container">
-
-          {/* TARJETA 1: ZONIFICACIÓN */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><Icons.Compass /></div>
-              <h3 className="card-title">ZONIFICACIÓN</h3>
-            </div>
-            <div className="card-body">
-              <label style={labelStyle}>ZONA ADMINISTRATIVA</label>
-              <select className="data-select" disabled={isLocked} value={zona} onChange={(e) => setZona(e.target.value)}>
-                <option value="">- Seleccionar Zona -</option>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
-                  <option key={n} value={n}>Zona {n}</option>
-                ))}
-              </select>
-              
-              <label style={labelStyle}>RÉGIMEN ESCOLAR</label>
-              <select className="data-select" disabled={isLocked}>
-                <option value="sierra">Sierra / Amazonía</option>
-                <option value="costa">Costa / Galápagos</option>
-              </select>
-            </div>
+          <div className="flex items-center gap-4 mb-8">
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl text-indigo-600 dark:text-indigo-400"><Compass size={24}/></div>
+            <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">Zonificación</h3>
           </div>
 
-          {/* TARJETA 2: DIVISIÓN POLÍTICA (Funcionalidad Clave) */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><Icons.Map /></div>
-              <h3 className="card-title">DIVISIÓN POLÍTICA</h3>
+          <div className="space-y-6">
+            <div>
+              <label className={labelStyle}>Zona Administrativa</label>
+              <div className={inputClass(lockZona)}>
+                <select className="bg-transparent outline-none w-full text-sm disabled:cursor-default" disabled={lockZona} value={zona} onChange={(e) => setZona(e.target.value)}>
+                  <option value="">- Seleccionar Zona -</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                    <option key={n} value={n}>Zona {n}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div className="card-body">
-              <label style={labelStyle}>PROVINCIA</label>
-              <select className="data-select" disabled={isLocked} value={provincia} onChange={handleProvinciaChange}>
-                <option value="">- Seleccionar Provincia -</option>
-                {Object.keys(ecuadorData).map(p => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
-
-              <label style={labelStyle}>CANTÓN</label>
-              <select className="data-select" disabled={isLocked || !provincia} value={canton} onChange={(e) => setCanton(e.target.value)}>
-                <option value="">- Seleccionar Cantón -</option>
-                {provincia && ecuadorData[provincia].map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+            <div>
+              <label className={labelStyle}>Régimen Escolar</label>
+              <div className={inputClass(lockZona)}>
+                <select className="bg-transparent outline-none w-full text-sm" disabled={lockZona}>
+                  <option value="sierra">Sierra / Amazonía</option>
+                  <option value="costa">Costa / Galápagos</option>
+                </select>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* TARJETA 3: DATOS ESPECÍFICOS */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><Icons.Pin /></div>
-              <h3 className="card-title">UBICACIÓN EXACTA</h3>
-            </div>
-            <div className="card-body">
-              <label style={labelStyle}>DISTRITO EDUCATIVO</label>
-              <input type="text" className="data-input" disabled={isLocked} placeholder="Ej: 17D05" />
-              
-              <label style={labelStyle}>CIUDAD / PARROQUIA</label>
-              <input type="text" className="data-input" disabled={isLocked} placeholder="Ingrese ciudad" />
-              
-              <label style={labelStyle}>ENLACE GOOGLE MAPS</label>
-              <input type="text" className="data-input" disabled={isLocked} placeholder="http://googleusercontent.com..." style={{color: '#00d2d3'}} />
-            </div>
+        {/* TARJETA 2: DIVISIÓN POLÍTICA */}
+        <div className="bg-white dark:bg-[#1e293b] p-8 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 relative">
+          <button onClick={() => setLockPolitica(!lockPolitica)} className="absolute top-8 right-8 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            {lockPolitica ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500 animate-pulse" />}
+          </button>
+
+          <div className="flex items-center gap-4 mb-8">
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl text-indigo-600 dark:text-indigo-400"><MapIcon size={24}/></div>
+            <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">División Política</h3>
           </div>
 
-          {/* TARJETA 4: JORNADAS */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><Icons.Clock /></div>
-              <h3 className="card-title">JORNADAS</h3>
+          <div className="space-y-6">
+            <div>
+              <label className={labelStyle}>Provincia</label>
+              <div className={inputClass(lockPolitica)}>
+                <select className="bg-transparent outline-none w-full text-sm" disabled={lockPolitica} value={provincia} onChange={handleProvinciaChange}>
+                  <option value="">- Seleccionar Provincia -</option>
+                  {Object.keys(ecuadorData).map(p => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div className="card-body">
-              <div className={`educational-level-box ${isLocked ? 'box-locked' : ''}`} style={{background: 'transparent', border: 'none', padding: 0}}>
-                <div className="checkbox-grid">
-                  <label className="check-item"><input type="checkbox" disabled={isLocked} /> Matutina</label>
-                  <label className="check-item"><input type="checkbox" disabled={isLocked} /> Vespertina</label>
-                  <label className="check-item"><input type="checkbox" disabled={isLocked} /> Nocturna</label>
+            <div>
+              <label className={labelStyle}>Cantón</label>
+              <div className={inputClass(lockPolitica)}>
+                <select className="bg-transparent outline-none w-full text-sm" disabled={lockPolitica || !provincia} value={canton} onChange={(e) => setCanton(e.target.value)}>
+                  <option value="">- Seleccionar Cantón -</option>
+                  {provincia && ecuadorData[provincia].map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* TARJETA 3: UBICACIÓN EXACTA */}
+        <div className="bg-white dark:bg-[#1e293b] p-8 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 relative">
+          <button onClick={() => setLockExacta(!lockExacta)} className="absolute top-8 right-8 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            {lockExacta ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500 animate-pulse" />}
+          </button>
+
+          <div className="flex items-center gap-4 mb-8">
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl text-indigo-600 dark:text-indigo-400"><MapPin size={24}/></div>
+            <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">Ubicación Exacta</h3>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className={labelStyle}>Distrito Educativo</label>
+              <div className={inputClass(lockExacta)}>
+                <input type="text" className="bg-transparent outline-none w-full text-sm" value={distrito} onChange={(e) => setDistrito(e.target.value)} disabled={lockExacta} />
+              </div>
+            </div>
+            <div>
+              <label className={labelStyle}>Ciudad / Parroquia</label>
+              <div className={inputClass(lockExacta)}>
+                <input type="text" className="bg-transparent outline-none w-full text-sm" value={ciudad} onChange={(e) => setCiudad(e.target.value)} disabled={lockExacta} />
+              </div>
+            </div>
+            <div>
+              <label className={labelStyle}>Enlace Google Maps</label>
+              <div className={inputClass(lockExacta)}>
+                <div className="flex items-center gap-2 w-full overflow-hidden">
+                  <Navigation size={14} className="text-indigo-500 shrink-0" />
+                  <input type="text" className="bg-transparent outline-none w-full text-[10px] text-indigo-500 font-bold truncate" value={gmaps} onChange={(e) => setGmaps(e.target.value)} disabled={lockExacta} />
                 </div>
               </div>
             </div>
           </div>
-
         </div>
 
-        <div style={{ maxWidth: '400px', margin: '0 auto 40px auto', padding: '0 20px' }}>
-          <button className="update-data-btn" disabled={isLocked} onClick={handleUpdate} style={{ opacity: isLocked ? 0.5 : 1 }}>
-            ACTUALIZAR UBICACIÓN
+        {/* TARJETA 4: JORNADAS */}
+        <div className="bg-white dark:bg-[#1e293b] p-8 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 relative">
+          <button onClick={() => setLockJornada(!lockJornada)} className="absolute top-8 right-8 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            {lockJornada ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500 animate-pulse" />}
           </button>
-        </div>
 
-      </main>
-    </>
+          <div className="flex items-center gap-4 mb-8">
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl text-indigo-600 dark:text-indigo-400"><Clock size={24}/></div>
+            <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">Jornadas</h3>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {['Matutina', 'Vespertina', 'Nocturna'].map((jornada) => (
+              <label key={jornada} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${lockJornada ? 'bg-gray-50 dark:bg-[#0f172a] border-gray-100 dark:border-gray-800 opacity-60' : 'hover:border-indigo-500 cursor-pointer bg-white dark:bg-gray-800 shadow-sm'}`}>
+                <input type="checkbox" disabled={lockJornada} defaultChecked={jornada === 'Matutina'} className="w-5 h-5 accent-indigo-600" />
+                <span className="text-sm font-bold dark:text-gray-300">{jornada}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* BOTÓN GUARDAR DINÁMICO */}
+      <AnimatePresence>
+        {(!lockZona || !lockPolitica || !lockExacta || !lockJornada) && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-10 left-0 right-0 z-50 flex justify-center px-4"
+          >
+            <button 
+              onClick={handleUpdate}
+              className="px-12 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-2xl shadow-indigo-500/40 transform transition-all active:scale-95 flex items-center gap-3"
+            >
+              <Navigation size={20} className="rotate-45" /> ACTUALIZAR UBICACIÓN
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 

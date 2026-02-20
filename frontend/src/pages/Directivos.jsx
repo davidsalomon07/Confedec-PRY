@@ -1,192 +1,237 @@
-import { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  IdCard, 
+  Lock, 
+  Unlock, 
+  ChevronLeft, 
+  ChevronRight, 
+  Camera,
+  ShieldCheck,
+  Trash2,
+  Upload
+} from 'lucide-react';
 
 function Directivo() {
-  
   useEffect(() => { window.scrollTo(0, 0); }, []);
-  const [isLocked, setIsLocked] = useOutletContext();
 
-  // Placeholder para cuando no hay foto (puedes cambiar esta URL por una imagen local tuya en /public)
-  const placeholderPhoto = "https://via.placeholder.com/150/3c096c/ffffff/?text=FOTO";
+  const placeholderPhoto = "https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=200&h=200&auto=format&fit=crop";
 
-  // --- ESTADOS (Incluyendo FOTOS) ---
+  // --- ESTADOS DE DATOS ---
   const [dirNombre, setDirNombre] = useState("");
   const [dirEmail, setDirEmail] = useState("");
   const [dirTelf, setDirTelf] = useState("");
   const [dirCedula, setDirCedula] = useState("");
-  const [dirPhoto, setDirPhoto] = useState(""); // Estado para la foto
+  const [dirPhoto, setDirPhoto] = useState(null); // Almacena la imagen local
 
   const [rectNombre, setRectNombre] = useState("");
   const [rectEmail, setRectEmail] = useState("");
   const [rectTelf, setRectTelf] = useState("");
   const [rectCedula, setRectCedula] = useState("");
-  const [rectPhoto, setRectPhoto] = useState(""); // Estado para la foto
+  const [rectPhoto, setRectPhoto] = useState(null);
 
   const [viceNombre, setViceNombre] = useState("");
   const [viceEmail, setViceEmail] = useState("");
   const [viceTelf, setViceTelf] = useState("");
   const [viceCedula, setViceCedula] = useState("");
-  const [vicePhoto, setVicePhoto] = useState(""); // Estado para la foto
+  const [vicePhoto, setVicePhoto] = useState(null);
 
   const [secNombre, setSecNombre] = useState("");
   const [secEmail, setSecEmail] = useState("");
   const [secTelf, setSecTelf] = useState("");
   const [secCedula, setSecCedula] = useState("");
-  const [secPhoto, setSecPhoto] = useState(""); // Estado para la foto
+  const [secPhoto, setSecPhoto] = useState(null);
 
-  const handleUpdate = () => {
-    alert("¡Datos y fotos de autoridades guardados correctamente!");
-    setIsLocked(true);
+  // ESTADOS DE BLOQUEO INDIVIDUAL
+  const [lockDir, setLockDir] = useState(true);
+  const [lockRect, setLockRect] = useState(true);
+  const [lockVice, setLockVice] = useState(true);
+  const [lockSec, setLockSec] = useState(true);
+
+  // ESTADO DEL CARRUSEL
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const fileInputRef = useRef(null);
+
+  const authorities = [
+    { id: 'dir', title: 'Director General', nombre: dirNombre, setNombre: setDirNombre, email: dirEmail, setEmail: setDirEmail, telf: dirTelf, setTelf: setDirTelf, cedula: dirCedula, setCedula: setDirCedula, photo: dirPhoto, setPhoto: setDirPhoto, locked: lockDir, setLocked: setLockDir },
+    { id: 'rect', title: 'Rectorado', nombre: rectNombre, setNombre: setRectNombre, email: rectEmail, setEmail: setRectEmail, telf: rectTelf, setTelf: setRectTelf, cedula: rectCedula, setCedula: setRectCedula, photo: rectPhoto, setPhoto: setRectPhoto, locked: lockRect, setLocked: setLockRect },
+    { id: 'vice', title: 'Vicerrectorado', nombre: viceNombre, setNombre: setViceNombre, email: viceEmail, setEmail: setViceEmail, telf: viceTelf, setTelf: setViceTelf, cedula: viceCedula, setCedula: setViceCedula, photo: vicePhoto, setPhoto: setVicePhoto, locked: lockVice, setLocked: setLockVice },
+    { id: 'sec', title: 'Secretaría', nombre: secNombre, setNombre: setSecNombre, email: secEmail, setEmail: setSecEmail, telf: secTelf, setTelf: setSecTelf, cedula: secCedula, setCedula: setSecCedula, photo: secPhoto, setPhoto: setSecPhoto, locked: lockSec, setLocked: setLockSec },
+  ];
+
+  const currentAuth = authorities[currentIndex];
+
+  // Función para manejar la subida de imagen
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        currentAuth.setPhoto(reader.result); // Guardamos la imagen en Base64
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  // Ícono de Usuario (SVG)
-  const UserIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-  );
+  const nextSlide = () => setCurrentIndex((prev) => (prev === authorities.length - 1 ? 0 : prev + 1));
+  const prevSlide = () => setCurrentIndex((prev) => (prev === 0 ? authorities.length - 1 : prev - 1));
 
-  // Helper para estilos de labels
-  const labelStyle = { color: '#aaa', fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '5px', textTransform: 'uppercase' };
+  const handleUpdate = () => {
+    alert("¡Autoridades actualizadas con éxito!");
+    setLockDir(true); setLockRect(true); setLockVice(true); setLockSec(true);
+  };
+
+  const inputClass = (locked) => `
+    w-full px-4 py-2.5 rounded-xl border text-sm transition-all duration-300 flex items-center justify-between
+    ${locked 
+      ? 'bg-gray-50 dark:bg-[#0f172a] border-gray-100 dark:border-gray-800 text-gray-500' 
+      : 'bg-white dark:bg-gray-800 border-indigo-500 dark:border-indigo-400 text-gray-900 dark:text-white shadow-lg shadow-indigo-500/10'}
+  `;
+
+  const labelStyle = "text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 mb-1.5 flex items-center gap-2";
 
   return (
-    <>
-      {/* BANNER */}
-      <div className="profile-hero-banner" style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '40px 20px' }}>
-        <div className="hero-content" style={{ width: '100%', zIndex: 1 }}>
-          <img src="/confedec.png" alt="Logo" className="hero-logo-large" />
-          <h1>CUADRO DIRECTIVO</h1>
-          <p>Datos de Contacto y Fotografías de las Autoridades</p>
-        </div>
-        <div className="hero-action-container" style={{ position: 'absolute', top: '30px', right: '30px', zIndex: 10 }}>
-          <button 
-            onClick={() => setIsLocked(!isLocked)}
-            className="banner-action-btn"
-            style={{ backgroundColor: isLocked ? 'rgba(255, 255, 255, 0.2)' : '#00d2d3', color: 'white', border: '1px solid rgba(255,255,255,0.4)', padding: '10px 20px', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s ease', backdropFilter: 'blur(5px)' }}
-          >
-            {isLocked ? (<><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>EDITAR AUTORIDADES</>) : (<><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>CANCELAR</>)}
-          </button>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto pb-20 px-4">
+      
+      {/* --- BANNER --- */}
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl mb-12 p-10 text-center">
+        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 opacity-30"></div>
+        <div className="relative z-10">
+          <img src="/confedec.png" alt="Logo" className="w-20 h-20 mx-auto mb-6 drop-shadow-2xl" />
+          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase italic">Cuadro Directivo</h1>
+          <p className="text-indigo-300 font-bold tracking-[0.3em] text-[10px] mt-2 uppercase">Gestión de Fotografías y Credenciales</p>
         </div>
       </div>
 
-      <main className="profile-data-grid">
+      {/* --- CARRUSEL --- */}
+      <div className="relative">
         
-        {!isLocked && (
-          <div style={{ maxWidth: '1200px', width: '95%', margin: '0 auto 20px auto', background: '#e1f5fe', padding: '15px', borderRadius: '8px', borderLeft: '5px solid #00d2d3', color: '#0277bd', textAlign: 'left' }}>
-            <strong>✏️ Editando:</strong> Actualice los datos y las URLs de las fotos.
-          </div>
+        {/* Navegación */}
+        <button onClick={prevSlide} className="absolute left-[-20px] md:left-[-60px] top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-[#1e293b] shadow-xl text-indigo-600 dark:text-indigo-400 border border-gray-100 dark:border-gray-700 hover:scale-110 transition-all">
+          <ChevronLeft size={24} />
+        </button>
+        <button onClick={nextSlide} className="absolute right-[-20px] md:right-[-60px] top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-[#1e293b] shadow-xl text-indigo-600 dark:text-indigo-400 border border-gray-100 dark:border-gray-700 hover:scale-110 transition-all">
+          <ChevronRight size={24} />
+        </button>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -50, opacity: 0 }}
+            className="bg-white dark:bg-[#1e293b] rounded-[3rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-5 min-h-[520px]">
+              
+              {/* SECCIÓN FOTO (IZQUIERDA) */}
+              <div className="md:col-span-2 relative bg-gray-50 dark:bg-[#0f172a] flex flex-col items-center justify-center p-8 border-r border-gray-100 dark:border-gray-800">
+                <div className="relative group/photo">
+                  <div className="w-48 h-48 md:w-64 md:h-64 rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800 transition-transform duration-500 group-hover/photo:scale-[1.02]">
+                    <img src={currentAuth.photo || placeholderPhoto} alt="Autoridad" className="w-full h-full object-cover" />
+                  </div>
+
+                  {/* Acciones de Imagen (Solo si está desbloqueado) */}
+                  {!currentAuth.locked && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-indigo-900/40 backdrop-blur-sm rounded-[2.5rem] flex flex-col items-center justify-center gap-4 transition-all">
+                      <button 
+                        onClick={() => fileInputRef.current.click()}
+                        className="p-3 bg-white text-indigo-600 rounded-full shadow-lg hover:scale-110 transition-transform"
+                        title="Subir Foto"
+                      >
+                        <Upload size={24} />
+                      </button>
+                      {currentAuth.photo && (
+                        <button 
+                          onClick={() => currentAuth.setPhoto(null)}
+                          className="p-3 bg-red-500 text-white rounded-full shadow-lg hover:scale-110 transition-transform"
+                          title="Eliminar Foto"
+                        >
+                          <Trash2 size={24} />
+                        </button>
+                      )}
+                      <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
+                    </motion.div>
+                  )}
+                  
+                  <div className="absolute -bottom-4 -right-4 p-4 bg-indigo-600 rounded-2xl shadow-xl text-white">
+                    <Camera size={24} />
+                  </div>
+                </div>
+
+                <div className="mt-8 text-center">
+                  <h3 className="text-2xl font-black text-gray-800 dark:text-white uppercase italic">{currentAuth.title}</h3>
+                  <div className="flex items-center gap-2 justify-center mt-1">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <p className="text-gray-400 font-bold text-[10px] tracking-widest uppercase">Estatus Oficial</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECCIÓN DATOS (DERECHA) */}
+              <div className="md:col-span-3 p-8 md:p-12 relative">
+                <button 
+                  onClick={() => currentAuth.setLocked(!currentAuth.locked)} 
+                  className="absolute top-8 right-8 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800 hover:scale-110 transition-all shadow-sm z-10"
+                >
+                  {currentAuth.locked ? <Lock size={20} className="text-gray-400" /> : <Unlock size={20} className="text-indigo-500" />}
+                </button>
+
+                <div className="space-y-6 mt-6">
+                  <div>
+                    <label className={labelStyle}><User size={12}/> Nombres Completos</label>
+                    <div className={inputClass(currentAuth.locked)}>
+                      <input type="text" className="bg-transparent outline-none w-full font-bold" value={currentAuth.nombre} onChange={(e) => currentAuth.setNombre(e.target.value)} disabled={currentAuth.locked} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={labelStyle}><IdCard size={12}/> Cédula de Identidad</label>
+                    <div className={inputClass(currentAuth.locked)}>
+                      <input type="text" className="bg-transparent outline-none w-full font-mono" value={currentAuth.cedula} onChange={(e) => currentAuth.setCedula(e.target.value)} disabled={currentAuth.locked} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelStyle}><Mail size={12}/> Email</label>
+                      <div className={inputClass(currentAuth.locked)}>
+                        <input type="email" className="bg-transparent outline-none w-full text-xs" value={currentAuth.email} onChange={(e) => currentAuth.setEmail(e.target.value)} disabled={currentAuth.locked} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className={labelStyle}><Phone size={12}/> Teléfono</label>
+                      <div className={inputClass(currentAuth.locked)}>
+                        <input type="tel" className="bg-transparent outline-none w-full text-xs" value={currentAuth.telf} onChange={(e) => currentAuth.setTelf(e.target.value)} disabled={currentAuth.locked} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 mt-12 justify-center md:justify-start">
+                  {authorities.map((_, idx) => (
+                    <div key={idx} className={`h-1.5 transition-all duration-300 rounded-full ${currentIndex === idx ? 'w-10 bg-indigo-600' : 'w-2 bg-gray-200 dark:bg-gray-700'}`} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* BOTÓN GUARDAR */}
+      <AnimatePresence>
+        {(!lockDir || !lockRect || !lockVice || !lockSec) && (
+          <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="fixed bottom-10 left-0 right-0 z-50 flex justify-center px-4">
+            <button onClick={handleUpdate} className="px-12 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-2xl shadow-indigo-500/40 flex items-center gap-3">
+              <ShieldCheck size={20} /> GUARDAR CAMBIOS DE AUTORIDADES
+            </button>
+          </motion.div>
         )}
+      </AnimatePresence>
 
-        {/* GRID DE TARJETAS CON FOTOS */}
-        <div className="directivos-grid-container">
-          
-          {/* TARJETA 1: DIRECTOR */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><UserIcon /></div>
-              <h3 className="card-title">DIRECTOR GENERAL</h3>
-            </div>
-            
-            <div className="card-content-flex">
-              {/* SECCIÓN FOTO */}
-              <div className="card-photo-section">
-                <img src={dirPhoto || placeholderPhoto} alt="Director" className="directivo-photo" />
-                {!isLocked && (
-                  <input type="text" className="data-input photo-url-input" placeholder="URL Foto..." value={dirPhoto} onChange={(e) => setDirPhoto(e.target.value)} />
-                )}
-              </div>
-
-              {/* SECCIÓN DATOS */}
-              <div className="card-body-data">
-                <label style={labelStyle}>NOMBRES COMPLETOS</label>
-                <input type="text" className="data-input" value={dirNombre} onChange={(e) => setDirNombre(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>CÉDULA</label>
-                <input type="text" className="data-input" value={dirCedula} onChange={(e) => setDirCedula(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>EMAIL</label>
-                <input type="email" className="data-input" value={dirEmail} onChange={(e) => setDirEmail(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>TELÉFONO</label>
-                <input type="tel" className="data-input" value={dirTelf} onChange={(e) => setDirTelf(e.target.value)} disabled={isLocked} />
-              </div>
-            </div>
-          </div>
-
-          {/* TARJETA 2: RECTORADO */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><UserIcon /></div>
-              <h3 className="card-title">RECTOR(A)</h3>
-            </div>
-            <div className="card-content-flex">
-              <div className="card-photo-section">
-                <img src={rectPhoto || placeholderPhoto} alt="Rector" className="directivo-photo" />
-                {!isLocked && ( <input type="text" className="data-input photo-url-input" placeholder="URL Foto..." value={rectPhoto} onChange={(e) => setRectPhoto(e.target.value)} /> )}
-              </div>
-              <div className="card-body-data">
-                <label style={labelStyle}>NOMBRES COMPLETOS</label>
-                <input type="text" className="data-input" value={rectNombre} onChange={(e) => setRectNombre(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>CÉDULA</label>
-                <input type="text" className="data-input" value={rectCedula} onChange={(e) => setRectCedula(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>EMAIL</label>
-                <input type="email" className="data-input" value={rectEmail} onChange={(e) => setRectEmail(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>TELÉFONO</label>
-                <input type="tel" className="data-input" value={rectTelf} onChange={(e) => setRectTelf(e.target.value)} disabled={isLocked} />
-              </div>
-            </div>
-          </div>
-
-          {/* TARJETA 3: VICERRECTORADO */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><UserIcon /></div>
-              <h3 className="card-title">VICERRECTOR(A)</h3>
-            </div>
-            <div className="card-content-flex">
-              <div className="card-photo-section">
-                <img src={vicePhoto || placeholderPhoto} alt="Vicerrector" className="directivo-photo" />
-                {!isLocked && ( <input type="text" className="data-input photo-url-input" placeholder="URL Foto..." value={vicePhoto} onChange={(e) => setVicePhoto(e.target.value)} /> )}
-              </div>
-              <div className="card-body-data">
-                <label style={labelStyle}>NOMBRES COMPLETOS</label>
-                <input type="text" className="data-input" value={viceNombre} onChange={(e) => setViceNombre(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>CÉDULA</label>
-                <input type="text" className="data-input" value={viceCedula} onChange={(e) => setViceCedula(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>EMAIL</label>
-                <input type="email" className="data-input" value={viceEmail} onChange={(e) => setViceEmail(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>TELÉFONO</label>
-                <input type="tel" className="data-input" value={viceTelf} onChange={(e) => setViceTelf(e.target.value)} disabled={isLocked} />
-              </div>
-            </div>
-          </div>
-
-          {/* TARJETA 4: SECRETARÍA */}
-          <div className="directivo-card">
-            <div className="card-header">
-              <div className="icon-circle"><UserIcon /></div>
-              <h3 className="card-title">SECRETARÍA</h3>
-            </div>
-            <div className="card-content-flex">
-              <div className="card-photo-section">
-                <img src={secPhoto || placeholderPhoto} alt="Secretaría" className="directivo-photo" />
-                {!isLocked && ( <input type="text" className="data-input photo-url-input" placeholder="URL Foto..." value={secPhoto} onChange={(e) => setSecPhoto(e.target.value)} /> )}
-              </div>
-              <div className="card-body-data">
-                <label style={labelStyle}>NOMBRES COMPLETOS</label>
-                <input type="text" className="data-input" value={secNombre} onChange={(e) => setSecNombre(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>CÉDULA</label>
-                <input type="text" className="data-input" value={secCedula} onChange={(e) => setSecCedula(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>EMAIL</label>
-                <input type="email" className="data-input" value={secEmail} onChange={(e) => setSecEmail(e.target.value)} disabled={isLocked} />
-                <label style={labelStyle}>TELÉFONO</label>
-                <input type="tel" className="data-input" value={secTelf} onChange={(e) => setSecTelf(e.target.value)} disabled={isLocked} />
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div style={{ maxWidth: '400px', margin: '0 auto 40px auto', padding: '0 20px' }}>
-          <button className="update-data-btn" disabled={isLocked} onClick={handleUpdate} style={{ opacity: isLocked ? 0.5 : 1 }}>GUARDAR TODOS LOS CAMBIOS</button>
-        </div>
-      </main>
-    </>
+    </motion.div>
   );
 }
 
