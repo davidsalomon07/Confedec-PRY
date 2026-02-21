@@ -23,7 +23,7 @@ function App() {
     }
   };
 
-  // 2. Función del Login (TU LÓGICA INTACTA)
+  // 2. Función del Login (ACTUALIZADA PARA REDIRECCIÓN INTELIGENTE)
   const handleLogin = async (e) => {
     e.preventDefault(); 
     setError(''); 
@@ -41,7 +41,10 @@ function App() {
         localStorage.setItem('user', JSON.stringify(data.user)); 
         setShowLogin(false); 
 
-        if (data.user.amie === 'FEDERACION') {
+        // --- LÓGICA DE REDIRECCIÓN INTELIGENTE ---
+        // Si el rol es admin_nacional o federacion, va a consultas.
+        // Si es cualquier otra cosa (institucion), va a perfil.
+        if (data.user.rol === 'admin_nacional' || data.user.rol === 'federacion') {
             navigate('/consultas');
         } else {
             navigate('/perfil');

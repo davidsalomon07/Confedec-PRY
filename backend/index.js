@@ -7,30 +7,59 @@ app.use(cors());
 app.use(express.json());
 
 // --- RUTA DE LOGIN (La que ya tenías validando contraseña) ---
+// --- RUTA DE LOGIN (INTELIGENTE: MULTI-ROL) ---
 app.post('/login', async (req, res) => {
   const { usuario, password } = req.body; 
 
   try {
-    const query = 'SELECT * FROM instituciones WHERE amie = $1';
-    const values = [usuario];
+    // 1. PRIMERO BUSCAMOS SI ES UN ADMINISTRADOR (Nacional o Federación)
+    const queryAdmin = 'SELECT * FROM usuarios_admin WHERE usuario = $1';
+    const resultAdmin = await pool.query(queryAdmin, [usuario]);
 
-    const result = await pool.query(query, values);
+    if (resultAdmin.rows.length > 0) {
+      const adminUser = resultAdmin.rows[0];
 
-    if (result.rows.length > 0) {
-      const user = result.rows[0];
-
-      // Verificamos contraseña
-      if (user.password === password) {
-          res.json({ 
-            success: true, 
-            user: user 
-          });
+      // Verificamos contraseña del Admin
+      if (adminUser.password === password) {
+        return res.json({ 
+          success: true, 
+          user: {
+            amie: adminUser.usuario, // Mandamos el nombre como AMIE para que el Frontend no se rompa
+            nombreInstitucion: adminUser.rol === 'admin_nacional' ? 'SISTEMA CONFEDEC NACIONAL' : `FEDERACIÓN ${adminUser.usuario.split('_')[1].toUpperCase()}`,
+            rol: adminUser.rol,
+            scope: adminUser.scope
+          } 
+        });
       } else {
-          res.status(401).json({ error: "Contraseña incorrecta" });
+        return res.status(401).json({ error: "Contraseña incorrecta" });
       }
-    } else {
-      res.status(401).json({ error: "El Código AMIE no existe" });
     }
+
+    // 2. SI NO ES ADMIN, BUSCAMOS SI ES UN COLEGIO (Tabla instituciones)
+    const queryEscuela = 'SELECT * FROM instituciones WHERE amie = $1';
+    const resultEscuela = await pool.query(queryEscuela, [usuario]);
+
+    if (resultEscuela.rows.length > 0) {
+      const schoolUser = resultEscuela.rows[0];
+
+      // Verificamos contraseña de la Institución
+      if (schoolUser.password === password) {
+        return res.json({ 
+          success: true, 
+          user: {
+            ...schoolUser,
+            rol: 'institucion',
+            scope: schoolUser.amie
+          } 
+        });
+      } else {
+        return res.status(401).json({ error: "Contraseña incorrecta" });
+      }
+    }
+
+    // 3. SI NO ESTÁ EN NINGUNA DE LAS DOS TABLAS
+    return res.status(401).json({ error: "El Usuario o Código AMIE no existe" });
+
   } catch (err) {
     console.error("DETALLE DEL ERROR:", err.message);
     res.status(500).json({ error: "Error en el servidor: " + err.message });
