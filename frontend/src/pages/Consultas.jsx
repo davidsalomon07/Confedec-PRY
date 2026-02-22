@@ -42,7 +42,7 @@ function Consultas() {
   const [selectedItems, setSelectedItems] = useState([]);
 
   useEffect(() => {
-    window.scrollTo(0, 0); // Añadido para consistencia con Directivo
+    window.scrollTo(0, 0); 
     const storedUser = JSON.parse(localStorage.getItem('user'));
     
     if (storedUser) {
@@ -63,7 +63,6 @@ function Consultas() {
     }
   }, []);
 
-  // Limpiar selección cuando se filtra o busca
   useEffect(() => {
     setSelectedItems([]);
   }, [searchTerm, filterLevel, filterGender]);
@@ -74,11 +73,9 @@ function Consultas() {
       fetch(url)
         .then(res => res.json())
         .then(dbData => {
-            // --- MAGIA: FILTRADO REAL POR FEDERACIÓN ---
             let datosFinales = dbData;
 
             if (role === 'federacion' && scope !== 'TODOS') {
-                // Filtramos las instituciones cuyo AMIE empiece con el código de provincia (scope)
                 datosFinales = dbData.filter(item => item.amie && item.amie.startsWith(scope));
             }
 
@@ -140,7 +137,6 @@ function Consultas() {
       setFilteredData(dataConEstudiantes);
   };
 
-  // Filtrado combinado
   useEffect(() => {
     let filtered = [...data];
 
@@ -179,9 +175,6 @@ function Consultas() {
     setFilteredData(filtered);
   }, [searchTerm, data, filterLevel, filterGender, isAdminView]);
 
-  // --- LÓGICA DE CHECKBOXES ---
-  
-  // 1. Manejar Check Individual
   const handleCheckboxChange = (item) => {
     const isSelected = selectedItems.some(selected => 
         isAdminView ? selected.amie === item.amie : selected.curso === item.curso
@@ -196,7 +189,6 @@ function Consultas() {
     }
   };
 
-  // 2. Manejar "Seleccionar Todo"
   const handleSelectAll = (e) => {
       if (e.target.checked) {
           setSelectedItems(filteredData);
@@ -205,7 +197,6 @@ function Consultas() {
       }
   };
 
-  // Cálculos adaptados
   const totalEstudiantes = isAdminView 
     ? 0 
     : filteredData.reduce((sum, item) => sum + item.estudiantes, 0);
@@ -222,7 +213,6 @@ function Consultas() {
       return 'Consultas';
   };
 
-  // --- EXPORTACIÓN INTELIGENTE ---
   const exportToCSV = () => {
     const dataToExport = selectedItems.length > 0 ? selectedItems : filteredData;
 
@@ -262,7 +252,7 @@ function Consultas() {
     const dataToExport = selectedItems.length > 0 ? selectedItems : filteredData;
     
     doc.setFontSize(18);
-    doc.setTextColor(102, 36, 131); // Mantenemos tu color original del PDF
+    doc.setTextColor(102, 36, 131); 
     doc.text(isAdminView ? getPageTitle() : 'CONFEDEC - Estudiantes por Curso', 14, 20);
     
     doc.setFontSize(10);
@@ -314,20 +304,26 @@ function Consultas() {
     '#f43f5e', '#f97316', '#f59e0b', '#eab308', '#84cc16'
   ];
 
-  // Estilos reutilizables (Idénticos a Directivo.jsx)
   const labelStyle = "text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 mb-1.5 flex items-center gap-2";
   const inputClass = "w-full px-4 py-2.5 rounded-xl border text-sm transition-all duration-300 flex items-center justify-between bg-white dark:bg-gray-800 border-indigo-500 dark:border-indigo-400 text-gray-900 dark:text-white shadow-lg shadow-indigo-500/10 outline-none";
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-7xl mx-auto pb-20 px-4">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }} // ¡AÑADIDO PARA MAYOR FLUIDEZ!
+      className="max-w-6xl mx-auto pb-24 px-4"
+    >
       
-      {/* --- BANNER --- */}
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl mb-12 p-10 text-center">
-        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 opacity-30"></div>
-        <div className="relative z-10">
-          <img src="/confedec.png" alt="Logo" className="w-20 h-20 mx-auto mb-6 drop-shadow-2xl" />
-          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase italic">{getPageTitle()}</h1>
-          <p className="text-indigo-300 font-bold tracking-[0.3em] text-[10px] mt-2 uppercase">
+      {/* --- BANNER INTEGRADO (DISEÑO PERSONAL) --- */}
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] shadow-2xl mb-12 p-10 text-center">
+        <div className="absolute inset-0 bg-indigo-500/10 backdrop-blur-[2px]"></div>
+        <div className="relative z-10 text-white">
+          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }}>
+            <img src="/confedec.png" alt="Logo" className="w-24 h-24 mx-auto mb-4 drop-shadow-2xl" />
+          </motion.div>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase italic">{getPageTitle()}</h1>
+          <p className="text-indigo-200 font-medium tracking-[0.3em] text-[10px] mt-2 uppercase">
             {isAdminView ? 'Gestión y Monitoreo de Instituciones' : 'Estudiantes por Curso - CONFEDEC'}
           </p>
         </div>
@@ -370,14 +366,13 @@ function Consultas() {
         )}
       </div>
 
-      {/* --- PANEL DE CONTROL (Buscador y Filtros) --- */}
+      {/* --- PANEL DE CONTROL --- */}
       <div className="bg-white dark:bg-[#1e293b] rounded-[3rem] shadow-2xl border border-gray-100 dark:border-gray-800 p-8 md:p-10 mb-12">
         <div className="flex items-center gap-4 mb-8">
           <div className="p-3 bg-indigo-50 dark:bg-[#0f172a] rounded-xl text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-gray-700"><Search size={24}/></div>
           <h3 className="text-2xl font-black text-gray-800 dark:text-white uppercase italic">Panel de Búsqueda</h3>
         </div>
 
-        {/* Buscador (Usando inputClass de Directivo) */}
         <div className="relative mb-8">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search size={18} className="text-gray-400" />
@@ -397,7 +392,6 @@ function Consultas() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 items-end">
-          {/* Filtros */}
           <div className="flex flex-col sm:flex-row gap-4">
             {!isAdminView && (
               <>
@@ -424,7 +418,6 @@ function Consultas() {
             )}
           </div>
 
-          {/* Botones de Acción */}
           <div className="flex flex-wrap gap-4 justify-start md:justify-end">
             {!isAdminView && (
               <div className="flex bg-gray-50 dark:bg-[#0f172a] p-1.5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-inner">
@@ -455,7 +448,12 @@ function Consultas() {
 
       {/* --- CONTENIDO PRINCIPAL --- */}
       {filteredData.length === 0 ? (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-[#1e293b] rounded-[3rem] p-16 text-center shadow-2xl border border-gray-100 dark:border-gray-800">
+        <motion.div 
+          key="empty-state" // ¡KEY AÑADIDA!
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          className="bg-white dark:bg-[#1e293b] rounded-[3rem] p-16 text-center shadow-2xl border border-gray-100 dark:border-gray-800"
+        >
           <div className="w-24 h-24 bg-gray-50 dark:bg-[#0f172a] rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-100 dark:border-gray-800">
             <Search className="h-10 w-10 text-gray-400" />
           </div>
@@ -465,8 +463,15 @@ function Consultas() {
       ) : (
         <AnimatePresence mode="wait">
           {/* VISTA TABLA */}
-          {(isAdminView || viewMode === 'table') && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="bg-white dark:bg-[#1e293b] rounded-[3rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+          {(isAdminView || viewMode === 'table') ? (
+            <motion.div 
+              key="table-view" // ¡KEY CRÍTICA AÑADIDA PARA FLUIDEZ!
+              initial={{ opacity: 0, y: 20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: -20 }} 
+              transition={{ duration: 0.4, delay: 0.1 }} // Retraso ligero
+              className="bg-white dark:bg-[#1e293b] rounded-[3rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden"
+            >
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -553,7 +558,6 @@ function Consultas() {
                       );
                     })}
                   </tbody>
-                  {/* FOOTER SOLO PARA COLEGIOS */}
                   {!isAdminView && (
                   <tfoot className="bg-gray-50 dark:bg-[#0f172a] border-t border-gray-100 dark:border-gray-800">
                     <tr>
@@ -568,13 +572,16 @@ function Consultas() {
                 </table>
               </div>
             </motion.div>
-          )}
-
-          {/* VISTA DE GRÁFICOS (SOLO USUARIO NORMAL) */}
-          {!isAdminView && viewMode === 'charts' && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-col gap-12">
-              
-              {/* Gráfico de Barras */}
+          ) : (
+            /* VISTA DE GRÁFICOS */
+            <motion.div 
+              key="charts-view" // ¡KEY CRÍTICA AÑADIDA PARA FLUIDEZ!
+              initial={{ opacity: 0, y: 20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: -20 }} 
+              transition={{ duration: 0.4, delay: 0.1 }} // Retraso ligero
+              className="flex flex-col gap-12"
+            >
               <div className="bg-white dark:bg-[#1e293b] rounded-[3rem] p-10 shadow-2xl border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-4 mb-10">
                   <div className="p-3 bg-indigo-50 dark:bg-[#0f172a] rounded-xl text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-gray-800"><BarChart2 size={24}/></div>
@@ -599,7 +606,6 @@ function Consultas() {
                 </div>
               </div>
 
-              {/* Gráfico de Pastel */}
               <div className="bg-white dark:bg-[#1e293b] rounded-[3rem] p-10 shadow-2xl border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-4 mb-10">
                   <div className="p-3 bg-purple-50 dark:bg-[#0f172a] rounded-xl text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-gray-800"><Percent size={24}/></div>
@@ -619,7 +625,6 @@ function Consultas() {
                   </ResponsiveContainer>
                 </div>
               </div>
-
             </motion.div>
           )}
         </AnimatePresence>
