@@ -65,27 +65,29 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// --- RUTA DE INSTITUCIONES: MODIFICADA CON FILTROS DINÁMICOS ---
+// --- RUTA DE INSTITUCIONES: MODIFICADA CON FILTROS Y JOIN CON UBICACION ---
 app.get('/instituciones', async (req, res) => {
   try {
     const { nombre, amie } = req.query; // Capturamos los filtros de la URL
-    let queryText = 'SELECT * FROM instituciones WHERE 1=1';
+    
+    // AQUI ESTA LA MAGIA: Unimos (LEFT JOIN) la tabla instituciones con la tabla ubicacion
+    let queryText = 'SELECT i.*, u."CANTON" as "Canton" FROM instituciones i LEFT JOIN ubicacion u ON i.amie = u.amie WHERE 1=1';
     const values = [];
 
     // Si el Súper Usuario filtra por Nombre
     if (nombre) {
       values.push(`%${nombre}%`);
-      // Usamos comillas dobles en "nombreInstitucion" por las mayúsculas en la BD
-      queryText += ` AND "nombreInstitucion" ILIKE $${values.length}`;
+      // Usamos comillas dobles en "nombreInstitucion" por las mayúsculas en la BD y el alias i.
+      queryText += ` AND i."nombreInstitucion" ILIKE $${values.length}`;
     }
 
     // Si el Súper Usuario filtra por AMIE
     if (amie) {
       values.push(amie);
-      queryText += ` AND amie = $${values.length}`;
+      queryText += ` AND i.amie = $${values.length}`;
     }
 
-    queryText += ' ORDER BY amie ASC';
+    queryText += ' ORDER BY i.amie ASC';
 
     const allInstitutions = await pool.query(queryText, values);
     res.json(allInstitutions.rows);
