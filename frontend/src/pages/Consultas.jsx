@@ -4,7 +4,7 @@ import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, Resp
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, BarChart2, Table as TableIcon, FileSpreadsheet, FileText, Users, BookOpen, Percent, X } from 'lucide-react';
+import { Search, BarChart2, Table as TableIcon, FileSpreadsheet, FileText, Users, BookOpen, Percent, X, Eye, CheckCircle2, XCircle, Calendar, School, BookOpenCheck } from 'lucide-react';
 
 // --- MAGIA: DICCIONARIO DE PROVINCIAS ---
 const CODIGOS_PROVINCIA = {
@@ -41,6 +41,10 @@ function Consultas() {
   // --- ESTADO PARA SELECCIÓN MÚLTIPLE ---
   const [selectedItems, setSelectedItems] = useState([]);
 
+  // --- NUEVOS ESTADOS PARA MODAL Y ESTADO ---
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedInstitution, setSelectedInstitution] = useState(null);
+
   useEffect(() => {
     window.scrollTo(0, 0); 
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -63,10 +67,6 @@ function Consultas() {
     }
   }, []);
 
-  useEffect(() => {
-    setSelectedItems([]);
-  }, [searchTerm, filterLevel, filterGender]);
-
   const cargarDatosAdministrativos = (role, scope) => {
       let url = 'http://localhost:5000/instituciones';
       
@@ -82,7 +82,8 @@ function Consultas() {
             const datosConProvincia = datosFinales.map(item => ({
                 ...item,
                 Provincia: item.Provincia || obtenerProvincia(item.amie),
-                Canton: item.Canton || 'NO DEFINIDO' 
+                Canton: item.Canton || 'NO DEFINIDO'
+                // NOTA: Sostenimiento, fechaCreacion, y niveles ya vienen en 'item'
             }));
 
             setData(datosConProvincia);
@@ -148,7 +149,8 @@ function Consultas() {
             filtered = filtered.filter(item => 
                 normalizeText(item.nombreInstitucion || '').includes(normalizedSearch) ||
                 normalizeText(item.amie || '').includes(normalizedSearch) ||
-                normalizeText(item.Provincia || '').includes(normalizedSearch)
+                normalizeText(item.Provincia || '').includes(normalizedSearch) ||
+                normalizeText(item.Sostenimiento || '').includes(normalizedSearch)
             );
         }
         setFilteredData(filtered);
@@ -175,6 +177,41 @@ function Consultas() {
     setFilteredData(filtered);
   }, [searchTerm, data, filterLevel, filterGender, isAdminView]);
 
+  // --- NUEVA LÓGICA: ACTUALIZAR ESTADO DE INSTITUCIÓN ---
+  const handleToggleEstado = async (amie, currentEstado) => {
+    // Si es null/undefined, asumimos que estaba true. Invertimos.
+    const isCurrentlyActive = currentEstado !== false; 
+    const newEstado = !isCurrentlyActive;
+
+    try {
+        const response = await fetch(`http://localhost:5000/instituciones/${amie}/estado`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ estado: newEstado })
+        });
+
+        if (response.ok) {
+            // Actualizamos el estado localmente para reflejar el cambio inmediato sin recargar
+            const updateList = (list) => list.map(item => 
+                item.amie === amie ? { ...item, estado: newEstado } : item
+            );
+            setData(updateList(data));
+            // updateList sobre filteredData ya se encarga el useEffect, 
+            // pero lo forzamos aquí para una UI instantánea
+            setFilteredData(updateList(filteredData));
+        } else {
+            console.error("Error al actualizar estado en el servidor");
+        }
+    } catch (error) {
+        console.error("Error de red al actualizar estado:", error);
+    }
+  };
+
+  const openInstitutionModal = (institution) => {
+      setSelectedInstitution(institution);
+      setIsModalOpen(true);
+  };
+
   const handleCheckboxChange = (item) => {
     const isSelected = selectedItems.some(selected => 
         isAdminView ? selected.amie === item.amie : selected.curso === item.curso
@@ -191,9 +228,17 @@ function Consultas() {
 
   const handleSelectAll = (e) => {
       if (e.target.checked) {
-          setSelectedItems(filteredData);
+          // Extraemos los IDs que ya están seleccionados para no duplicar
+          const existingIds = new Set(selectedItems.map(item => isAdminView ? item.amie : item.curso));
+          // Filtramos solo los nuevos que vamos a añadir
+          const newItems = filteredData.filter(item => !existingIds.has(isAdminView ? item.amie : item.curso));
+          
+          // Unimos los que ya tenías + los nuevos de esta búsqueda
+          setSelectedItems([...selectedItems, ...newItems]);
       } else {
-          setSelectedItems([]);
+          // Si desmarca la casilla, solo quitamos los que están visibles en la búsqueda actual, manteniendo los demás
+          const visibleIds = new Set(filteredData.map(item => isAdminView ? item.amie : item.curso));
+          setSelectedItems(selectedItems.filter(item => !visibleIds.has(isAdminView ? item.amie : item.curso)));
       }
   };
 
@@ -213,27 +258,32 @@ function Consultas() {
       return 'Consultas';
   };
 
-  const exportToCSV = () => {
+  // --- FUNCIONES DE EXPORTACIÓN GENERAL (TABLA) ---
+  const exportToCSV = (clearAfter = true) => {
     const dataToExport = selectedItems.length > 0 ? selectedItems : filteredData;
 
     if (isAdminView) {
-        const headers = ['AMIE', 'Institucion', 'Provincia', 'Canton'];
+        const headers = ['AMIE', 'Institucion', 'Provincia', 'Canton', 'Estado'];
         const csvContent = [
             headers.join(','),
-            ...dataToExport.map(item => `"${item.amie}","${item.nombreInstitucion}","${item.Provincia}","${item.Canton}"`)
+            ...dataToExport.map(item => `"${item.amie}","${item.nombreInstitucion}","${item.Provincia}","${item.Canton || 'NO DEFINIDO'}","${item.estado !== false ? 'Activo' : 'Inactivo'}"`)
         ].join('\n');
         
         downloadCSV(csvContent, `instituciones_admin_${new Date().toISOString().split('T')[0]}.csv`);
-        return;
+    } else {
+        const headers = ['Curso', 'Estudiantes'];
+        const csvContent = [
+          headers.join(','),
+          ...dataToExport.map(item => `"${item.curso}",${item.estudiantes}`)
+        ].join('\n');
+
+        downloadCSV(csvContent, `estudiantes_confedec.csv`);
     }
 
-    const headers = ['Curso', 'Estudiantes'];
-    const csvContent = [
-      headers.join(','),
-      ...dataToExport.map(item => `"${item.curso}",${item.estudiantes}`)
-    ].join('\n');
-
-    downloadCSV(csvContent, `estudiantes_confedec.csv`);
+    // Limpia la selección si se solicita y si había algo seleccionado
+    if (clearAfter && selectedItems.length > 0) {
+        setSelectedItems([]);
+    }
   };
 
   const downloadCSV = (content, filename) => {
@@ -247,7 +297,7 @@ function Consultas() {
     document.body.removeChild(link);
   }
 
-  const exportToPDF = () => {
+  const exportToPDF = (clearAfter = true) => {
     const doc = new jsPDF();
     const dataToExport = selectedItems.length > 0 ? selectedItems : filteredData;
     
@@ -269,8 +319,8 @@ function Consultas() {
 
     let head, body;
     if (isAdminView) {
-        head = [['AMIE', 'Institución', 'Provincia', 'Cantón']];
-        body = dataToExport.map(item => [item.amie, item.nombreInstitucion, item.Provincia, item.Canton]);
+        head = [['AMIE', 'Institución', 'Provincia', 'Cantón', 'Estado']];
+        body = dataToExport.map(item => [item.amie, item.nombreInstitucion, item.Provincia, item.Canton || 'NO DEFINIDO', item.estado !== false ? 'Activo' : 'Inactivo']);
     } else {
         head = [['Curso', 'Estudiantes']];
         body = dataToExport.map(item => [item.curso, item.estudiantes]);
@@ -297,6 +347,92 @@ function Consultas() {
     });
 
     doc.save(`reporte_confedec_${new Date().toISOString().split('T')[0]}.pdf`);
+
+    // Limpia la selección si se solicita y si había algo seleccionado
+    if (clearAfter && selectedItems.length > 0) {
+        setSelectedItems([]);
+    }
+  };
+
+  // --- NUEVA FUNCIÓN: DESCARGAR AMBOS ---
+  const exportBoth = () => {
+      // Llamamos a ambas funciones pero les decimos que NO limpien la selección aún (false)
+      exportToCSV(false);
+      exportToPDF(false);
+      
+      // Limpiamos la selección manualmente al final
+      setTimeout(() => {
+        if (selectedItems.length > 0) {
+            setSelectedItems([]);
+        }
+      }, 500); // Pequeño retraso para asegurar que ambas descargas inicien
+  };
+
+  // --- EXPORTACIÓN INDIVIDUAL (FICHA TÉCNICA) ---
+  const exportSingleToCSV = () => {
+    if (!selectedInstitution) return;
+    
+    const headers = ['AMIE', 'Nombre Institucion', 'Provincia', 'Canton', 'Sostenimiento', 'Creacion', 'Celebracion', 'Estado'];
+    const values = [
+      selectedInstitution.amie,
+      selectedInstitution.nombreInstitucion,
+      selectedInstitution.Provincia,
+      selectedInstitution.Canton || 'NO DEFINIDO',
+      selectedInstitution.Sostenimiento || 'No registrado',
+      selectedInstitution.fechaCreacion || '--',
+      selectedInstitution.fechaCelebracion || '--',
+      selectedInstitution.estado !== false ? 'Activo' : 'Inactivo'
+    ].map(val => `"${val}"`);
+
+    const csvContent = headers.join(',') + '\n' + values.join(',');
+    downloadCSV(csvContent, `Ficha_${selectedInstitution.amie}.csv`);
+  };
+
+  const exportSingleToPDF = () => {
+    if (!selectedInstitution) return;
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.setTextColor(102, 36, 131); 
+    doc.text('FICHA TÉCNICA INSTITUCIONAL', 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generado: ${new Date().toLocaleDateString('es-EC')}`, 14, 28);
+    
+    // Información General
+    doc.setFontSize(12);
+    doc.setTextColor(40, 40, 40);
+    doc.text(`AMIE: ${selectedInstitution.amie}`, 14, 40);
+    doc.text(`Nombre: ${selectedInstitution.nombreInstitucion}`, 14, 48);
+    doc.text(`Ubicación: ${selectedInstitution.Provincia} - ${selectedInstitution.Canton || 'NO DEFINIDO'}`, 14, 56);
+    doc.text(`Sostenimiento: ${selectedInstitution.Sostenimiento || 'No registrado'}`, 14, 64);
+    doc.text(`Estado: ${selectedInstitution.estado !== false ? 'Activo' : 'Inactivo'}`, 14, 72);
+
+    // Tabla de Niveles
+    const niveles = [
+      { key: 'Maternal', label: 'Maternal' }, { key: 'Preparatoria', label: 'Preparatoria' },
+      { key: 'Inicial', label: 'Inicial' }, { key: 'Media', label: 'EGB Media' },
+      { key: 'Superior', label: 'EGB Superior' }, { key: 'Bachiller', label: 'Bachillerato' },
+      { key: 'B Tecnico', label: 'B. Técnico' }, { key: 'BI', label: 'B. Internacional' },
+    ];
+
+    const body = niveles.map(n => {
+      const loOferta = selectedInstitution[n.key] && selectedInstitution[n.key].toString().trim() !== '';
+      return [n.label, loOferta ? 'OFERTADO' : 'NO OFERTADO'];
+    });
+    
+    autoTable(doc, {
+      startY: 85,
+      head: [['Nivel Educativo', 'Disponibilidad']],
+      body: body,
+      theme: 'grid',
+      headStyles: { fillColor: [102, 36, 131], textColor: 255, halign: 'center' },
+      bodyStyles: { halign: 'center' },
+      alternateRowStyles: { fillColor: [245, 240, 250] },
+    });
+
+    doc.save(`Ficha_${selectedInstitution.amie}.pdf`);
   };
 
   const COLORS = [
@@ -311,11 +447,11 @@ function Consultas() {
     <motion.div 
       initial={{ opacity: 0, y: 20 }} 
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }} // ¡AÑADIDO PARA MAYOR FLUIDEZ!
+      transition={{ duration: 0.5, ease: "easeOut" }} 
       className="max-w-6xl mx-auto pb-24 px-4"
     >
       
-      {/* --- BANNER INTEGRADO (DISEÑO PERSONAL) --- */}
+      {/* --- BANNER INTEGRADO --- */}
       <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] shadow-2xl mb-12 p-10 text-center">
         <div className="absolute inset-0 bg-indigo-500/10 backdrop-blur-[2px]"></div>
         <div className="relative z-10 text-white">
@@ -379,7 +515,7 @@ function Consultas() {
           </div>
           <input
             type="text"
-            placeholder={isAdminView ? "Buscar institución por nombre, AMIE..." : "Buscar curso por nombre..."}
+            placeholder={isAdminView ? "Buscar institución por nombre, AMIE o sostenimiento..." : "Buscar curso por nombre..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`${inputClass} pl-12 py-4 text-base font-medium`}
@@ -391,57 +527,75 @@ function Consultas() {
           )}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 items-end">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {!isAdminView && (
-              <>
-                <div className="w-full">
-                  <label className={labelStyle}>Nivel Educativo</label>
-                  <select value={filterLevel} onChange={(e) => setFilterLevel(e.target.value)} className={inputClass}>
-                    <option value="all" className="dark:bg-[#1e293b]">Todos los niveles</option>
-                    <option value="maternal" className="dark:bg-[#1e293b]">Maternal</option>
-                    <option value="inicial" className="dark:bg-[#1e293b]">Inicial</option>
-                    <option value="egb" className="dark:bg-[#1e293b]">EGB-E</option>
-                    <option value="bgu" className="dark:bg-[#1e293b]">BGU</option>
-                    <option value="btp" className="dark:bg-[#1e293b]">BTP</option>
-                  </select>
-                </div>
-                <div className="w-full">
-                  <label className={labelStyle}>Género</label>
-                  <select value={filterGender} onChange={(e) => setFilterGender(e.target.value)} className={inputClass}>
-                    <option value="all" className="dark:bg-[#1e293b]">General</option>
-                    <option value="hombres" className="dark:bg-[#1e293b]">Hombres</option>
-                    <option value="mujeres" className="dark:bg-[#1e293b]">Mujeres</option>
-                  </select>
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="flex flex-wrap gap-4 justify-start md:justify-end">
-            {!isAdminView && (
-              <div className="flex bg-gray-50 dark:bg-[#0f172a] p-1.5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-inner">
-                  <button 
-                    onClick={() => setViewMode('charts')} 
-                    className={`px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${viewMode === 'charts' ? 'bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-md border border-indigo-100 dark:border-gray-700' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
-                  >
-                    <BarChart2 size={16} /> Gráficos
-                  </button>
-                  <button 
-                    onClick={() => setViewMode('table')} 
-                    className={`px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${viewMode === 'table' ? 'bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-md border border-indigo-100 dark:border-gray-700' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
-                  >
-                    <TableIcon size={16} /> Tabla
-                  </button>
+        <div className="flex flex-col gap-6 mt-4">
+          {/* --- FILA 1: Filtros (Ocultos para Admin) --- */}
+          {!isAdminView && (
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="w-full">
+                <label className={labelStyle}>Nivel Educativo</label>
+                <select value={filterLevel} onChange={(e) => setFilterLevel(e.target.value)} className={inputClass}>
+                  <option value="all" className="dark:bg-[#1e293b]">Todos los niveles</option>
+                  <option value="maternal" className="dark:bg-[#1e293b]">Maternal</option>
+                  <option value="inicial" className="dark:bg-[#1e293b]">Inicial</option>
+                  <option value="egb" className="dark:bg-[#1e293b]">EGB-E</option>
+                  <option value="bgu" className="dark:bg-[#1e293b]">BGU</option>
+                  <option value="btp" className="dark:bg-[#1e293b]">BTP</option>
+                </select>
               </div>
-            )}
+              <div className="w-full">
+                <label className={labelStyle}>Género</label>
+                <select value={filterGender} onChange={(e) => setFilterGender(e.target.value)} className={inputClass}>
+                  <option value="all" className="dark:bg-[#1e293b]">General</option>
+                  <option value="hombres" className="dark:bg-[#1e293b]">Hombres</option>
+                  <option value="mujeres" className="dark:bg-[#1e293b]">Mujeres</option>
+                </select>
+              </div>
+            </div>
+          )}
 
-            <button onClick={exportToCSV} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/30 transition-transform active:scale-95 flex items-center gap-2">
-              <FileSpreadsheet size={18} /> CSV {selectedItems.length > 0 && `(${selectedItems.length})`}
-            </button>
-            <button onClick={exportToPDF} className="px-6 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-2xl shadow-lg shadow-rose-500/30 transition-transform active:scale-95 flex items-center gap-2">
-              <FileText size={18} /> PDF {selectedItems.length > 0 && `(${selectedItems.length})`}
-            </button>
+          {/* --- FILA 2: Botones de Acción Lado a Lado --- */}
+          <div className="flex flex-wrap gap-4 items-center justify-between w-full">
+            
+            {/* GRUPO IZQUIERDA: Limpiar y Vistas */}
+            <div className="flex items-center gap-4">
+              {/* BOTÓN LIMPIAR (Alineado a la izquierda) */}
+              {selectedItems.length > 0 && (
+                <button 
+                  onClick={() => setSelectedItems([])} 
+                  className="px-4 py-3 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 font-bold transition-colors flex items-center gap-2"
+                  title="Desmarcar todas las instituciones"
+                >
+                  <X size={18} /> Limpiar ({selectedItems.length})
+                </button>
+              )}
+
+              {!isAdminView && (
+                <div className="flex bg-gray-50 dark:bg-[#0f172a] p-1.5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-inner">
+                    <button onClick={() => setViewMode('charts')} className={`px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${viewMode === 'charts' ? 'bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-md border border-indigo-100 dark:border-gray-700' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}>
+                      <BarChart2 size={16} /> Gráficos
+                    </button>
+                    <button onClick={() => setViewMode('table')} className={`px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${viewMode === 'table' ? 'bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-md border border-indigo-100 dark:border-gray-700' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}>
+                      <TableIcon size={16} /> Tabla
+                    </button>
+                </div>
+              )}
+            </div>
+
+            {/* GRUPO DERECHA: Descargas */}
+            <div className="flex gap-2">
+              <button onClick={() => exportToCSV(true)} className="px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/30 transition-transform active:scale-95 flex items-center gap-2">
+                <FileSpreadsheet size={18} /> CSV
+              </button>
+              
+              <button onClick={() => exportToPDF(true)} className="px-5 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-2xl shadow-lg shadow-rose-500/30 transition-transform active:scale-95 flex items-center gap-2">
+                <FileText size={18} /> PDF
+              </button>
+              
+              {/* BOTÓN: DESCARGAR AMBOS (Ahora siempre visible) */}
+              <button onClick={exportBoth} className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transition-transform active:scale-95 flex items-center gap-2 border border-indigo-500" title="Descargar PDF y CSV a la vez">
+                <span className="flex items-center gap-1"><FileSpreadsheet size={16} /> + <FileText size={16} /></span> Ambos
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -449,7 +603,7 @@ function Consultas() {
       {/* --- CONTENIDO PRINCIPAL --- */}
       {filteredData.length === 0 ? (
         <motion.div 
-          key="empty-state" // ¡KEY AÑADIDA!
+          key="empty-state" 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           className="bg-white dark:bg-[#1e293b] rounded-[3rem] p-16 text-center shadow-2xl border border-gray-100 dark:border-gray-800"
@@ -465,11 +619,11 @@ function Consultas() {
           {/* VISTA TABLA */}
           {(isAdminView || viewMode === 'table') ? (
             <motion.div 
-              key="table-view" // ¡KEY CRÍTICA AÑADIDA PARA FLUIDEZ!
+              key="table-view" 
               initial={{ opacity: 0, y: 20 }} 
               animate={{ opacity: 1, y: 0 }} 
               exit={{ opacity: 0, y: -20 }} 
-              transition={{ duration: 0.4, delay: 0.1 }} // Retraso ligero
+              transition={{ duration: 0.4, delay: 0.1 }}
               className="bg-white dark:bg-[#1e293b] rounded-[3rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden"
             >
               <div className="overflow-x-auto">
@@ -480,7 +634,14 @@ function Consultas() {
                           <input 
                               type="checkbox" 
                               onChange={handleSelectAll}
-                              checked={selectedItems.length === filteredData.length && filteredData.length > 0}
+                              checked={
+                                  filteredData.length > 0 && 
+                                  filteredData.every(fItem => 
+                                      selectedItems.some(sItem => 
+                                          isAdminView ? sItem.amie === fItem.amie : sItem.curso === fItem.curso
+                                      )
+                                  )
+                              }
                               className="w-5 h-5 accent-indigo-600 cursor-pointer rounded border-gray-300"
                           />
                       </th>
@@ -490,7 +651,10 @@ function Consultas() {
                               <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">AMIE</th>
                               <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Nombre Institución</th>
                               <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Provincia</th>
+                              {/* NUEVAS COLUMNAS */}
                               <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Cantón</th>
+                              <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">Estado</th>
+                              <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">Acciones</th>
                           </>
                       ) : (
                           <>
@@ -509,12 +673,15 @@ function Consultas() {
                       );
                       
                       const percentage = !isAdminView ? ((item.estudiantes / totalEstudiantes) * 100).toFixed(2) : 0;
+                      
+                      // Opacidad reducida si está inactivo
+                      const isActive = item.estado !== false; 
                       const rowBgClass = isSelected 
                           ? 'bg-indigo-50/50 dark:bg-indigo-900/20' 
                           : 'bg-white dark:bg-[#1e293b] hover:bg-gray-50 dark:hover:bg-[#0f172a]/50';
 
                       return (
-                        <tr key={index} className={`${rowBgClass} transition-colors duration-200`}>
+                        <tr key={index} className={`${rowBgClass} transition-all duration-200 ${!isActive && isAdminView ? 'opacity-50 grayscale-[0.5]' : ''}`}>
                            <td className="px-8 py-5 text-center">
                               <input 
                                   type="checkbox" 
@@ -527,9 +694,39 @@ function Consultas() {
                            {isAdminView ? (
                               <>
                                   <td className="px-6 py-5 font-bold text-indigo-600 dark:text-indigo-400 text-sm">{item.amie}</td>
-                                  <td className="px-6 py-5 font-bold text-gray-800 dark:text-white text-sm">{item.nombreInstitucion}</td>
+                                  <td className="px-6 py-5 font-bold text-gray-800 dark:text-white text-sm">
+                                      {item.nombreInstitucion}
+                                      {!isActive && <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Inactivo</span>}
+                                  </td>
                                   <td className="px-6 py-5 text-gray-500 dark:text-gray-400 text-sm font-medium">{item.Provincia}</td>
-                                  <td className="px-6 py-5 text-gray-500 dark:text-gray-400 text-sm font-medium">{item.Canton}</td>
+                                  
+                                  {/* COLUMNA CANTÓN */}
+                                  <td className="px-6 py-5">
+                                    <span className="inline-block whitespace-nowrap px-3 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50">
+                                      {item.Canton || 'NO DEFINIDO'}
+                                    </span>
+                                  </td>
+                                  
+                                  {/* COLUMNA ESTADO (TOGGLE) */}
+                                  <td className="px-6 py-5 text-center">
+                                      <button
+                                          onClick={(e) => { e.stopPropagation(); handleToggleEstado(item.amie, item.estado); }}
+                                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${isActive ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+                                      >
+                                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isActive ? 'translate-x-6' : 'translate-x-1'}`} />
+                                      </button>
+                                  </td>
+
+                                  {/* COLUMNA ACCIONES */}
+                                  <td className="px-6 py-5 text-center">
+                                      <button
+                                          onClick={(e) => { e.stopPropagation(); openInstitutionModal(item); }}
+                                          className="p-2 bg-indigo-50 dark:bg-[#0f172a] text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors border border-indigo-100 dark:border-gray-800 shadow-sm"
+                                          title="Ver Ficha Técnica"
+                                      >
+                                          <Eye size={18} />
+                                      </button>
+                                  </td>
                               </>
                            ) : (
                               <>
@@ -575,13 +772,14 @@ function Consultas() {
           ) : (
             /* VISTA DE GRÁFICOS */
             <motion.div 
-              key="charts-view" // ¡KEY CRÍTICA AÑADIDA PARA FLUIDEZ!
+              key="charts-view" 
               initial={{ opacity: 0, y: 20 }} 
               animate={{ opacity: 1, y: 0 }} 
               exit={{ opacity: 0, y: -20 }} 
-              transition={{ duration: 0.4, delay: 0.1 }} // Retraso ligero
+              transition={{ duration: 0.4, delay: 0.1 }} 
               className="flex flex-col gap-12"
             >
+              {/* Contenido de gráficos inalterado */}
               <div className="bg-white dark:bg-[#1e293b] rounded-[3rem] p-10 shadow-2xl border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-4 mb-10">
                   <div className="p-3 bg-indigo-50 dark:bg-[#0f172a] rounded-xl text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-gray-800"><BarChart2 size={24}/></div>
@@ -629,6 +827,130 @@ function Consultas() {
           )}
         </AnimatePresence>
       )}
+
+      {/* --- MODAL DE FICHA TÉCNICA (NUEVO) --- */}
+      <AnimatePresence>
+        {isModalOpen && selectedInstitution && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+            onClick={() => setIsModalOpen(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              onClick={(e) => e.stopPropagation()} // Evita que se cierre al hacer clic dentro
+              className="bg-white dark:bg-[#1e293b] rounded-[2.5rem] w-full max-w-3xl overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-800 relative"
+            >
+              {/* Header del Modal */}
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white relative">
+                
+                {/* BOTONES DE ACCIÓN (NUEVOS) */}
+                <div className="absolute top-6 right-6 flex items-center gap-2">
+                  <button 
+                    onClick={exportSingleToCSV}
+                    title="Exportar Ficha a CSV"
+                    className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors backdrop-blur-md"
+                  >
+                    <FileSpreadsheet size={20} />
+                  </button>
+                  <button 
+                    onClick={exportSingleToPDF}
+                    title="Exportar Ficha a PDF"
+                    className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors backdrop-blur-md"
+                  >
+                    <FileText size={20} />
+                  </button>
+                  <div className="w-px h-6 bg-white/20 mx-1"></div> {/* Separador */}
+                  <button 
+                    onClick={() => setIsModalOpen(false)}
+                    title="Cerrar Ficha"
+                    className="p-2 bg-white/10 hover:bg-red-500/80 rounded-xl transition-colors backdrop-blur-md"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-4 mb-2 pr-32"> {/* padding-right añadido para que no choque con los botones */}
+                  <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
+                    AMIE: {selectedInstitution.amie}
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase ${selectedInstitution.estado !== false ? 'bg-emerald-500' : 'bg-red-500'}`}>
+                    {selectedInstitution.estado !== false ? 'Activo' : 'Inactivo'}
+                  </span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black italic pr-32">{selectedInstitution.nombreInstitucion}</h2>
+                <p className="text-indigo-100 mt-2 font-medium flex items-center gap-2">
+                  <School size={16}/> {selectedInstitution.Provincia} - {selectedInstitution.Canton || 'NO DEFINIDO'}
+                </p>
+              </div>
+
+              {/* Contenido del Modal */}
+              <div className="p-8 grid md:grid-cols-2 gap-8">
+                {/* Columna Izquierda: Info General */}
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <BookOpenCheck size={16}/> Información General
+                    </h4>
+                    <div className="bg-gray-50 dark:bg-[#0f172a] p-5 rounded-2xl border border-gray-100 dark:border-gray-800 space-y-4">
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 font-bold mb-1">SOSTENIMIENTO</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{selectedInstitution.Sostenimiento || 'No registrado'}</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-bold mb-1 flex items-center gap-1"><Calendar size={12}/> CREACIÓN</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{selectedInstitution.fechaCreacion || '--'}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-bold mb-1 flex items-center gap-1"><Calendar size={12}/> CELEBRACIÓN</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{selectedInstitution.fechaCelebracion || '--'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Columna Derecha: Niveles Educativos */}
+                <div>
+                  <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <BookOpen size={16}/> Niveles Ofertados
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Renderizamos condicionalmente si la columna existe y es true/"si" */}
+                    {[
+                      { key: 'Maternal', label: 'Maternal' },
+                      { key: 'Preparatoria', label: 'Preparatoria' },
+                      { key: 'Inicial', label: 'Inicial' },
+                      { key: 'Media', label: 'EGB Media' },
+                      { key: 'Superior', label: 'EGB Superior' },
+                      { key: 'Bachiller', label: 'Bachillerato' },
+                      { key: 'B Tecnico', label: 'B. Técnico' },
+                      { key: 'BI', label: 'B. Internacional' },
+                    ].map((nivel) => {
+                      // Verificamos si el nivel está marcado como activo en tu base de datos (por ejemplo, con una "X", "Si", o booleano)
+                      // Asumimos que si no está vacío, lo oferta. Ajusta esto según cómo guardes los datos en tu tabla.
+                      const loOferta = selectedInstitution[nivel.key] && selectedInstitution[nivel.key].toString().trim() !== '';
+                      
+                      return (
+                        <div key={nivel.key} className={`flex items-center gap-2 p-3 rounded-xl border ${loOferta ? 'bg-indigo-50/50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300' : 'bg-gray-50 dark:bg-[#0f172a] border-gray-100 dark:border-gray-800 text-gray-400 dark:text-gray-600'}`}>
+                          {loOferta ? <CheckCircle2 size={16} className="text-emerald-500"/> : <XCircle size={16}/>}
+                          <span className="text-sm font-bold">{nivel.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
     </motion.div>
   );
 }

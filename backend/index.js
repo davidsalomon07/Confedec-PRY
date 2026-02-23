@@ -6,7 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- RUTA DE LOGIN (La que ya tenías validando contraseña) ---
 // --- RUTA DE LOGIN (INTELIGENTE: MULTI-ROL) ---
 app.post('/login', async (req, res) => {
   const { usuario, password } = req.body; 
@@ -67,7 +66,6 @@ app.post('/login', async (req, res) => {
 });
 
 // --- RUTA DE INSTITUCIONES: MODIFICADA CON FILTROS DINÁMICOS ---
-// Ahora permite recibir parámetros como ?nombre=ABC o ?amie=123
 app.get('/instituciones', async (req, res) => {
   try {
     const { nombre, amie } = req.query; // Capturamos los filtros de la URL
@@ -97,7 +95,35 @@ app.get('/instituciones', async (req, res) => {
   }
 });
 
-// --- RUTA DE PRUEBA (La que ya tenías) ---
+// =========================================================================
+// NUEVA RUTA PARA ACTUALIZAR EL ESTADO (ACTIVO/INACTIVO) DESDE EL CHECKBOX
+// =========================================================================
+app.put('/instituciones/:amie/estado', async (req, res) => {
+  const { amie } = req.params;
+  const { estado } = req.body; // Esperamos un booleano (true/false)
+
+  try {
+    // Actualizamos solo la columna estado para el AMIE específico
+    const updateQuery = 'UPDATE instituciones SET estado = $1 WHERE amie = $2 RETURNING *';
+    const result = await pool.query(updateQuery, [estado, amie]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Institución no encontrada" });
+    }
+
+    res.json({ 
+      success: true, 
+      message: `Estado actualizado correctamente para ${amie}`,
+      institucion: result.rows[0]
+    });
+  } catch (err) {
+    console.error("Error al actualizar el estado:", err.message);
+    res.status(500).json({ error: "Error interno del servidor al actualizar estado" });
+  }
+});
+// =========================================================================
+
+// --- RUTA DE PRUEBA ---
 app.get('/test-db', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()'); 
