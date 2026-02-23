@@ -150,7 +150,9 @@ function Consultas() {
                 normalizeText(item.nombreInstitucion || '').includes(normalizedSearch) ||
                 normalizeText(item.amie || '').includes(normalizedSearch) ||
                 normalizeText(item.Provincia || '').includes(normalizedSearch) ||
-                normalizeText(item.Sostenimiento || '').includes(normalizedSearch)
+                normalizeText(item.Sostenimiento || '').includes(normalizedSearch) ||
+                normalizeText(item.Canton || '').includes(normalizedSearch) ||
+                normalizeText(item.estado !== false ? 'activo' : 'inactivo').includes(normalizedSearch)
             );
         }
         setFilteredData(filtered);
@@ -515,7 +517,7 @@ function Consultas() {
           </div>
           <input
             type="text"
-            placeholder={isAdminView ? "Buscar institución por nombre, AMIE o sostenimiento..." : "Buscar curso por nombre..."}
+            placeholder={isAdminView ? "Buscar institución por AMIE, Nombre, Provincia, Cantón, Estado y Sostenimiento" : "Buscar curso por nombre..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`${inputClass} pl-12 py-4 text-base font-medium`}
