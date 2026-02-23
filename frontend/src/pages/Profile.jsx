@@ -19,18 +19,22 @@ function Profile() {
   // 0. CARGA DE DATOS (Conectada a tu BD pgAdmin)
   useEffect(() => { 
     window.scrollTo(0, 0); 
-    const savedData = localStorage.getItem('user_data');
+    // Cambiamos 'user_data' por 'user', que es como lo guarda tu Login
+    const savedData = localStorage.getItem('user'); 
+    
     if (savedData) {
       const user = JSON.parse(savedData);
       
-      // Mapeo según los nombres de columna de tu imagen de la BD
+      // Mapeo exacto con las variables que envía el backend
       if (user.amie) setAmie(user.amie); 
-      if (user.nombreinstitucion) setNombreInst(user.nombreinstitucion); //
+      if (user.nombreInstitucion) setNombreInst(user.nombreInstitucion); // I mayúscula
       if (user.Sostenimiento) setTipoSostenimiento(user.Sostenimiento.toLowerCase());
+      
+      // Mapeo de fecha si existe, si no, lo dejamos en blanco
       if (user.fechaCreacion) setFechaCreacion(user.fechaCreacion);
       
-      if (user.nombreinstitucion) {
-        setHistoria(`La institución ${user.nombreinstitucion} es parte fundamental de la red de educación católica...`);
+      if (user.nombreInstitucion) {
+        setHistoria(`La institución ${user.nombreInstitucion} es parte fundamental de la red de educación católica en Ecuador...`);
       }
     }
   }, []);
