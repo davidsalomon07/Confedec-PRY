@@ -1,3 +1,4 @@
+// src/pages/Informacion.jsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -46,7 +47,7 @@ function Informacion() {
     w-full px-4 py-3 rounded-xl border transition-all duration-300 flex items-center justify-between
     ${locked 
       ? 'bg-gray-100 dark:bg-[#0f172a] border-gray-200 dark:border-gray-800 text-gray-500' 
-      : 'bg-white dark:bg-gray-800 border-indigo-500 dark:border-indigo-400 text-gray-900 dark:text-white shadow-lg shadow-indigo-500/10'}
+      : 'bg-white dark:bg-gray-800 border-indigo-500 dark:border-indigo-400 text-gray-900 dark:text-white shadow-lg shadow-indigo-500/10 outline-none'}
   `;
 
   const labelStyle = "text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 mb-2 flex items-center gap-2";
@@ -55,15 +56,19 @@ function Informacion() {
     <motion.div 
       initial={{ opacity: 0, y: 20 }} 
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-6xl mx-auto pb-20 px-4"
+      transition={{ duration: 0.5, ease: "easeOut" }} // FLUIDEZ AÑADIDA
+      className="max-w-6xl mx-auto pb-24 px-4"
     >
-      {/* --- BANNER PRINCIPAL --- */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-800 to-slate-900 shadow-2xl mb-12 p-10 text-center">
-        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-        <div className="relative z-10">
-          <img src="/confedec.png" alt="Logo" className="w-20 h-20 mx-auto mb-6 drop-shadow-2xl" />
-          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase">Información Institucional</h1>
-          <p className="text-slate-400 font-medium tracking-widest text-xs mt-2 uppercase italic">Datos de Contacto, Legalidad y Presencia Digital</p>
+      
+      {/* --- BANNER INTEGRADO (DISEÑO UNIFICADO) --- */}
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] shadow-2xl mb-12 p-10 text-center">
+        <div className="absolute inset-0 bg-indigo-500/10 backdrop-blur-[2px]"></div>
+        <div className="relative z-10 text-white">
+          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }}>
+            <img src="/confedec.png" alt="Logo" className="w-24 h-24 mx-auto mb-4 drop-shadow-2xl" />
+          </motion.div>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase italic">Información Institucional</h1>
+          <p className="text-indigo-200 font-medium tracking-[0.3em] text-[10px] mt-2 uppercase">Datos de Contacto, Legalidad y Presencia Digital</p>
         </div>
       </div>
 
@@ -79,7 +84,8 @@ function Informacion() {
           </button>
 
           <div className="flex items-center gap-4 mb-8">
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl text-indigo-600 dark:text-indigo-400"><MapPin size={24}/></div>
+            {/* Ícono unificado */}
+            <div className="p-3 bg-indigo-50 dark:bg-[#0f172a] rounded-2xl text-indigo-600 dark:text-indigo-400"><MapPin size={24}/></div>
             <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">Sede y Contacto</h3>
           </div>
 
@@ -121,7 +127,8 @@ function Informacion() {
           </button>
 
           <div className="flex items-center gap-4 mb-8">
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl text-indigo-600 dark:text-indigo-400"><ShieldCheck size={24}/></div>
+             {/* Ícono unificado */}
+            <div className="p-3 bg-indigo-50 dark:bg-[#0f172a] rounded-2xl text-indigo-600 dark:text-indigo-400"><ShieldCheck size={24}/></div>
             <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">Legalidad</h3>
           </div>
 
@@ -151,7 +158,8 @@ function Informacion() {
           </button>
 
           <div className="flex items-center gap-4 mb-10">
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl text-indigo-600 dark:text-indigo-400"><Globe size={24}/></div>
+             {/* Ícono unificado */}
+            <div className="p-3 bg-indigo-50 dark:bg-[#0f172a] rounded-2xl text-indigo-600 dark:text-indigo-400"><Globe size={24}/></div>
             <h3 className="font-black text-gray-800 dark:text-white tracking-tight uppercase italic text-lg">Presencia Digital</h3>
           </div>
 
@@ -176,15 +184,15 @@ function Informacion() {
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <Facebook size={18} className="text-blue-600" />
-                  <input type="text" className="bg-transparent border-b border-gray-200 dark:border-gray-700 outline-none w-full py-1 text-sm dark:text-gray-300" value={facebook} onChange={(e) => setFacebook(e.target.value)} disabled={lockDigital} />
+                  <input type="text" className="bg-transparent border-b border-gray-200 dark:border-gray-700 outline-none w-full py-1 text-sm dark:text-gray-300 transition-colors focus:border-indigo-500" value={facebook} onChange={(e) => setFacebook(e.target.value)} disabled={lockDigital} />
                 </div>
                 <div className="flex items-center gap-4">
                   <Instagram size={18} className="text-pink-500" />
-                  <input type="text" className="bg-transparent border-b border-gray-200 dark:border-gray-700 outline-none w-full py-1 text-sm dark:text-gray-300" value={instagram} onChange={(e) => setInstagram(e.target.value)} disabled={lockDigital} />
+                  <input type="text" className="bg-transparent border-b border-gray-200 dark:border-gray-700 outline-none w-full py-1 text-sm dark:text-gray-300 transition-colors focus:border-indigo-500" value={instagram} onChange={(e) => setInstagram(e.target.value)} disabled={lockDigital} />
                 </div>
                 <div className="flex items-center gap-4">
                   <Twitter size={18} className="text-sky-400" />
-                  <input type="text" className="bg-transparent border-b border-gray-200 dark:border-gray-700 outline-none w-full py-1 text-sm dark:text-gray-300" value={twitter} onChange={(e) => setTwitter(e.target.value)} disabled={lockDigital} />
+                  <input type="text" className="bg-transparent border-b border-gray-200 dark:border-gray-700 outline-none w-full py-1 text-sm dark:text-gray-300 transition-colors focus:border-indigo-500" value={twitter} onChange={(e) => setTwitter(e.target.value)} disabled={lockDigital} />
                 </div>
               </div>
             </div>

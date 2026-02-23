@@ -93,21 +93,43 @@ function Directivo() {
 
   const labelStyle = "text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 mb-1.5 flex items-center gap-2";
 
+  // --- VARIANTES DE ANIMACIÓN ---
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.15 } // Efecto cascada
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  };
+
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto pb-20 px-4">
+    <motion.div 
+      key="page-directivo" // LA KEY PARA FORZAR LA ANIMACIÓN AL ENTRAR
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="max-w-6xl mx-auto pb-20 px-4" // AQUÍ CAMBIAMOS A max-w-6xl
+    >
       
-      {/* --- BANNER --- */}
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl mb-12 p-10 text-center">
-        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 opacity-30"></div>
-        <div className="relative z-10">
-          <img src="/confedec.png" alt="Logo" className="w-20 h-20 mx-auto mb-6 drop-shadow-2xl" />
-          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase italic">Cuadro Directivo</h1>
-          <p className="text-indigo-300 font-bold tracking-[0.3em] text-[10px] mt-2 uppercase">Gestión de Fotografías y Credenciales</p>
+      {/* --- BANNER (CON DISEÑO UNIFICADO) --- */}
+      <motion.div variants={itemVariants} className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] shadow-2xl mb-12 p-10 text-center">
+        <div className="absolute inset-0 bg-indigo-500/10 backdrop-blur-[2px]"></div>
+        <div className="relative z-10 text-white">
+          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }}>
+             <img src="/confedec.png" alt="Logo" className="w-24 h-24 mx-auto mb-4 drop-shadow-2xl" />
+          </motion.div>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase italic">Cuadro Directivo</h1>
+          <p className="text-indigo-200 font-medium tracking-[0.3em] text-[10px] mt-2 uppercase">Gestión de Fotografías y Credenciales</p>
         </div>
-      </div>
+      </motion.div>
 
       {/* --- CARRUSEL --- */}
-      <div className="relative">
+      <motion.div variants={itemVariants} className="relative">
         
         {/* Navegación */}
         <button onClick={prevSlide} className="absolute left-[-20px] md:left-[-60px] top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-[#1e293b] shadow-xl text-indigo-600 dark:text-indigo-400 border border-gray-100 dark:border-gray-700 hover:scale-110 transition-all">
@@ -218,7 +240,7 @@ function Directivo() {
             </div>
           </motion.div>
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       {/* BOTÓN GUARDAR */}
       <AnimatePresence>
