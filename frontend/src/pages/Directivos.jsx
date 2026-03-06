@@ -12,7 +12,8 @@ import {
   Camera,
   ShieldCheck,
   Trash2,
-  Upload
+  Upload,
+  CheckCircle2
 } from 'lucide-react';
 
 function Directivo() {
@@ -78,9 +79,11 @@ function Directivo() {
 
   const nextSlide = () => setCurrentIndex((prev) => (prev === authorities.length - 1 ? 0 : prev + 1));
   const prevSlide = () => setCurrentIndex((prev) => (prev === 0 ? authorities.length - 1 : prev - 1));
+  const [showToast, setShowToast] = useState(false);
 
   const handleUpdate = () => {
-    alert("¡Autoridades actualizadas con éxito!");
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
     setLockDir(true); setLockRect(true); setLockVice(true); setLockSec(true);
   };
 
@@ -249,6 +252,26 @@ function Directivo() {
             <button onClick={handleUpdate} className="px-12 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-2xl shadow-indigo-500/40 flex items-center gap-3">
               <ShieldCheck size={20} /> GUARDAR CAMBIOS DE AUTORIDADES
             </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- NOTIFICACIÓN TOAST ELEGANTE --- */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            exit={{ opacity: 0, x: 50, transition: { duration: 0.2 } }}
+            className="fixed top-24 right-8 z-[100] flex items-center gap-4 bg-white dark:bg-[#1e293b] px-6 py-4 rounded-2xl shadow-2xl shadow-emerald-500/20 border border-emerald-100 dark:border-emerald-500/30"
+          >
+            <div className="bg-emerald-100 dark:bg-emerald-500/20 p-2 rounded-full">
+              <CheckCircle2 size={24} className="text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-gray-800 dark:text-white uppercase tracking-wider">¡Éxito!</p>
+              <p className="text-xs font-bold text-gray-500 dark:text-gray-400">Autoridades actualizadas con éxito.</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
