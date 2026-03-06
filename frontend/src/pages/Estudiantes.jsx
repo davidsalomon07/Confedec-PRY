@@ -9,7 +9,8 @@ import {
   Lock, 
   Unlock, 
   GraduationCap,
-  Calculator
+  Calculator,
+  CheckCircle2
 } from 'lucide-react';
 
 function Estudiantes() {
@@ -27,8 +28,9 @@ function Estudiantes() {
   // 3. ESTADOS DE BLOQUEO INDIVIDUAL (Candados)
   const [lockSeleccion, setLockSeleccion] = useState(true);
   const [lockConteo, setLockConteo] = useState(true);
+  const [showToast, setShowToast] = useState(false);
 
-  // 🎯 CURSOS SEGÚN NIVEL (Tu lógica intacta)
+  // CURSOS SEGÚN NIVEL
   const cursosPorNivel = {
     'Inicial': ['Inicial 3 años', 'Inicial 4 años'],
     'Preparatoria': ['1° EGB'],
@@ -37,7 +39,7 @@ function Estudiantes() {
     'Básica Superior': ['8° EGB', '9° EGB', '10° EGB']
   };
 
-  // 🧼 MANEJO DE CAMBIOS (Preservando funcionalidad)
+  // MANEJO DE CAMBIOS
   const handleNivelChange = (e) => {
     setNivel(e.target.value);
     setCurso('');
@@ -51,7 +53,8 @@ function Estudiantes() {
   };
 
   const handleGuardar = () => {
-    alert('¡Registro de estudiantes actualizado correctamente!');
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
     setLockSeleccion(true);
     setLockConteo(true);
   };
@@ -207,6 +210,26 @@ function Estudiantes() {
             >
               <GraduationCap size={20} /> ACTUALIZAR REGISTRO ACADÉMICO
             </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- NOTIFICACIÓN TOAST ELEGANTE --- */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            exit={{ opacity: 0, x: 50, transition: { duration: 0.2 } }}
+            className="fixed top-24 right-8 z-[100] flex items-center gap-4 bg-white dark:bg-[#1e293b] px-6 py-4 rounded-2xl shadow-2xl shadow-emerald-500/20 border border-emerald-100 dark:border-emerald-500/30"
+          >
+            <div className="bg-emerald-100 dark:bg-emerald-500/20 p-2 rounded-full">
+              <CheckCircle2 size={24} className="text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-gray-800 dark:text-white uppercase tracking-wider">¡Éxito!</p>
+              <p className="text-xs font-bold text-gray-500 dark:text-gray-400">Registro de estudiantes actualizado.</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
