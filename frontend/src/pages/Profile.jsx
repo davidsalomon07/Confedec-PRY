@@ -12,7 +12,8 @@ import {
   MapPin, 
   Building2, 
   Info,
-  HandHelping 
+  HandHelping,
+  CheckCircle2
 } from 'lucide-react'; 
 
 function Profile() {
@@ -54,10 +55,13 @@ function Profile() {
   const [lockGest, setLockGest] = useState(true);
   const [lockHist, setLockHist] = useState(true);
   const [lockOfer, setLockOfer] = useState(false); // Oferta abierta para checks
+  const [showToast, setShowToast] = useState(false);
 
   const handleUpdate = () => {
-    alert("¡Información actualizada correctamente!");
-    setLockId(true); setLockGest(true); setLockHist(true);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+    // Volvemos a bloquear todas las tarjetas, incluyendo la oferta
+    setLockId(true); setLockGest(true); setLockHist(true); setLockOfer(true);
   };
 
   const inputClass = (locked) => `
@@ -190,15 +194,19 @@ function Profile() {
         </div>
 
         {/* TARJETA 4: OFERTA ACADÉMICA (Habilitada para checks) */}
-        <div className="md:col-span-2 bg-white dark:bg-[#1e293b] p-8 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800">
+        <div className="md:col-span-2 bg-white dark:bg-[#1e293b] p-8 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 relative">
+          <button onClick={() => setLockOfer(!lockOfer)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-10">
+            {lockOfer ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500" />}
+          </button>
+
           <div className="flex items-center gap-4 mb-8">
             <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl text-indigo-600 dark:text-indigo-400"><GraduationCap size={24}/></div>
             <h3 className="font-black text-gray-800 dark:text-white tracking-wide uppercase italic">Oferta Académica</h3>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {['Inicial', 'Preparatoria', 'Básica Elemental', 'Básica Media', 'Básica Superior', 'Bachillerato'].map((item) => (
-              <label key={item} className={`flex items-center gap-3 p-4 rounded-2xl border transition-all hover:border-indigo-500 cursor-pointer bg-white dark:bg-gray-800 shadow-sm`}>
-                <input type="checkbox" defaultChecked className="w-5 h-5 accent-indigo-600" />
+              <label key={item} className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${lockOfer ? 'bg-gray-50 dark:bg-[#0f172a] border-gray-100 dark:border-gray-800 opacity-60' : 'hover:border-indigo-500 cursor-pointer bg-white dark:bg-gray-800 shadow-sm'}`}>
+                <input type="checkbox" defaultChecked disabled={lockOfer} className="w-5 h-5 accent-indigo-600 disabled:cursor-not-allowed" />
                 <span className="text-sm font-semibold dark:text-gray-300">{item}</span>
               </label>
             ))}
@@ -235,14 +243,42 @@ function Profile() {
         </AnimatePresence>
       </div>
 
-      <div className="mt-12 flex justify-center">
-        <button 
-          onClick={handleUpdate}
-          className="px-12 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-2xl shadow-indigo-500/40 transform transition-all active:scale-95 flex items-center gap-3"
-        >
-          <Unlock size={20} /> GUARDAR CAMBIOS INSTITUCIONALES
-        </button>
-      </div>
+      {/* BOTÓN GUARDAR DINÁMICO */}
+      <AnimatePresence>
+        {(!lockId || !lockGest || !lockHist || !lockOfer) && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-10 left-0 right-0 z-50 flex justify-center px-4"
+          >
+            <button 
+              onClick={handleUpdate}
+              className="px-12 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-2xl shadow-indigo-500/40 transform transition-all active:scale-95 flex items-center gap-3"
+            >
+              <Unlock size={20} /> GUARDAR CAMBIOS INSTITUCIONALES
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- NOTIFICACIÓN TOAST ELEGANTE --- */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            exit={{ opacity: 0, x: 50, transition: { duration: 0.2 } }}
+            className="fixed top-24 right-8 z-[100] flex items-center gap-4 bg-white dark:bg-[#1e293b] px-6 py-4 rounded-2xl shadow-2xl shadow-emerald-500/20 border border-emerald-100 dark:border-emerald-500/30"
+          >
+            <div className="bg-emerald-100 dark:bg-emerald-500/20 p-2 rounded-full">
+              <CheckCircle2 size={24} className="text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-gray-800 dark:text-white uppercase tracking-wider">¡Éxito!</p>
+              <p className="text-xs font-bold text-gray-500 dark:text-gray-400">Información actualizada correctamente.</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </motion.div>
   );
