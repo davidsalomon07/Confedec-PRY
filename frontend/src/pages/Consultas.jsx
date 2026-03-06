@@ -318,20 +318,31 @@ function Consultas() {
     const doc = new jsPDF();
     const dataToExport = selectedItems.length > 0 ? selectedItems : filteredData;
     
+    // Extraemos el nombre de la institución directamente del localStorage
+    const storedUser = JSON.parse(localStorage.getItem('user')) || {};
+    const nombreInst = storedUser.nombreInstitucion ? storedUser.nombreInstitucion.toUpperCase() : 'CONFEDEC';
+    
     doc.setFontSize(18);
     doc.setTextColor(102, 36, 131); 
-    doc.text(isAdminView ? getPageTitle() : 'CONFEDEC - Estudiantes por Curso', 14, 20);
+    // Usamos el nombre del colegio si es una institución, si no, usa el título de admin
+    doc.text(isAdminView ? getPageTitle() : `${nombreInst} - Estudiantes por Curso`, 14, 20);
     
+    // Obtenemos fecha y hora exactas
+    const now = new Date();
+    const fecha = now.toLocaleDateString('es-EC');
+    const hora = now.toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit', hour12: true });
+
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Generado: ${new Date().toLocaleDateString('es-EC')}`, 14, 28);
+    doc.text(`Generado: ${fecha}`, 14, 28);
+    doc.text(`Hora: ${hora}`, 14, 34); // Nueva línea para la hora
     
     doc.setFontSize(11);
     doc.setTextColor(60, 60, 60);
     if (selectedItems.length > 0) {
-        doc.text(`Reporte Parcial: ${selectedItems.length} registros seleccionados`, 14, 36);
+        doc.text(`Reporte Parcial: ${selectedItems.length} registros seleccionados`, 14, 44); // Lo bajamos un poco para dar espacio a la hora
     } else {
-        doc.text(`Reporte Total: ${dataToExport.length} registros`, 14, 36);
+        doc.text(`Reporte Total: ${dataToExport.length} registros`, 14, 44); // Lo bajamos un poco
     }
 
     let head, body;
@@ -344,7 +355,7 @@ function Consultas() {
     }
     
     autoTable(doc, {
-      startY: 45,
+      startY: 52, // Bajamos el inicio de la tabla para que no choque con el nuevo texto
       head: head,
       body: body,
       theme: 'grid',
@@ -359,11 +370,12 @@ function Consultas() {
         valign: 'middle'
       },
       alternateRowStyles: { fillColor: [245, 240, 250] },
-      margin: { top: 45 },
+      margin: { top: 52 },
       styles: { fontSize: 9, cellPadding: 5 }
     });
 
-    doc.save(`reporte_confedec_${new Date().toISOString().split('T')[0]}.pdf`);
+    // Guardamos con un nombre de archivo más dinámico
+    doc.save(`reporte_${isAdminView ? 'admin' : 'institucion'}_${fecha.replace(/\//g, '-')}.pdf`);
 
     if (clearAfter && selectedItems.length > 0) {
         setSelectedItems([]);
