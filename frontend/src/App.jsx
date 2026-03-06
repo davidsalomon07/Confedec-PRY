@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion' // 👈 Animaciones
-import { Moon, Sun, MapPin, Phone, Mail, ExternalLink, User, Lock, ChevronDown, Menu } from 'lucide-react' // 👈 Iconos
+import { Moon, Sun, MapPin, Phone, Mail, ExternalLink, User, Lock, ChevronDown, Menu, Eye, EyeOff } from 'lucide-react' // 👈 Iconos
 import { useTheme } from './context/ThemeContext' // 👈 Modo Oscuro
 // import './App.css' <--- YA NO LO NECESITAMOS, LO COMENTAMOS
 
@@ -14,6 +14,7 @@ function App() {
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // 1. Función para el Scroll Suave
   const scrollToSection = (id) => {
@@ -324,14 +325,23 @@ function App() {
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                       <Lock size={16} /> Contraseña
                     </label>
-                    <input 
-                      type="password" 
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-primary outline-none transition-all dark:text-white"
-                      placeholder="••••••••" 
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required 
-                    />
+                    <div className="relative">
+                      <input 
+                        type={showPassword ? "text" : "password"} 
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-primary outline-none transition-all dark:text-white pr-12"
+                        placeholder="••••••••" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary dark:hover:text-indigo-400 transition-colors"
+                      >
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
                   </div>
 
                   {error && <p className="text-red-500 text-sm text-center bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">{error}</p>}
