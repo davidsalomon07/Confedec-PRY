@@ -54,7 +54,7 @@ function Profile() {
   const [lockId, setLockId] = useState(true);
   const [lockGest, setLockGest] = useState(true);
   const [lockHist, setLockHist] = useState(true);
-  const [lockOfer, setLockOfer] = useState(false); // Oferta abierta para checks
+  const [lockOfer, setLockOfer] = useState(true); // Oferta abierta para checks
   const [showToast, setShowToast] = useState(false);
 
   const handleUpdate = () => {
