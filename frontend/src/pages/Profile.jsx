@@ -29,7 +29,13 @@ function Profile() {
       // Mapeo exacto con las variables que envía el backend
       if (user.amie) setAmie(user.amie); 
       if (user.nombreInstitucion) setNombreInst(user.nombreInstitucion); // I mayúscula
-      if (user.Sostenimiento) setTipoSostenimiento(user.Sostenimiento.toLowerCase());
+      if (user.Sostenimiento) {
+        // Convierte el dato de la BD a un arreglo, separando por comas si es necesario
+        const arraySost = Array.isArray(user.Sostenimiento) 
+          ? user.Sostenimiento.map(s => s.toLowerCase())
+          : user.Sostenimiento.toLowerCase().split(',').map(s => s.trim());
+        setTipoSostenimientos(arraySost);
+      }
       
       // Mapeo de fecha si existe, si no, lo dejamos en blanco
       if (user.fechaCreacion) setFechaCreacion(user.fechaCreacion);
@@ -43,7 +49,7 @@ function Profile() {
   // 1. ESTADOS DE INFORMACIÓN
   const [nombreInst, setNombreInst] = useState("");
   const [amie, setAmie] = useState(""); 
-  const [tipoSostenimiento, setTipoSostenimiento] = useState("particular");
+  const [tipoSostenimientos, setTipoSostenimientos] = useState(["particular"]);
   const [distrito, setDistrito] = useState("Zona 9 - Distrito 17D05"); 
   const [fechaCreacion, setFechaCreacion] = useState("");
   const [historia, setHistoria] = useState("");
@@ -56,6 +62,13 @@ function Profile() {
   const [lockHist, setLockHist] = useState(true);
   const [lockOfer, setLockOfer] = useState(true); // Oferta abierta para checks
   const [showToast, setShowToast] = useState(false);
+
+  // Función para manejar el marcado/desmarcado de checkboxes
+  const toggleSostenimiento = (tipo) => {
+    setTipoSostenimientos(prev => 
+      prev.includes(tipo) ? prev.filter(t => t !== tipo) : [...prev, tipo]
+    );
+  };
 
   const handleUpdate = () => {
     setShowToast(true);
@@ -141,19 +154,25 @@ function Profile() {
           <div className="space-y-5">
             <div>
               <label className={labelStyle}><Building2 size={14} /> Sostenimiento</label>
-              <div className={inputClass(lockGest)}>
-                <select 
-                  className="bg-transparent outline-none w-full capitalize text-gray-900 dark:text-white" 
-                  value={tipoSostenimiento} 
-                  onChange={(e) => setTipoSostenimiento(e.target.value)} 
-                  disabled={lockGest}
-                >
-                  <option value="particular" className="dark:bg-[#1e293b]">Particular</option>
-                  <option value="fiscomisional" className="dark:bg-[#1e293b]">Fiscomisional</option>
-                  <option value="fiscal" className="dark:bg-[#1e293b]">Fiscal</option>
-                  <option value="municipal" className="dark:bg-[#1e293b]">Municipal</option>
-                  <option value="obra-social" className="dark:bg-[#1e293b]">Obra Social</option>
-                </select>
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                {[
+                  { id: 'particular', label: 'Particular' },
+                  { id: 'fiscomisional', label: 'Fiscomisional' },
+                  { id: 'fiscal', label: 'Fiscal' },
+                  { id: 'municipal', label: 'Municipal' },
+                  { id: 'obra-social', label: 'Obra Social' }
+                ].map((tipo) => (
+                  <label key={tipo.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${lockGest ? 'bg-gray-50 dark:bg-[#0f172a] border-gray-100 dark:border-gray-800 opacity-60' : 'hover:border-indigo-500 cursor-pointer bg-white dark:bg-gray-800 shadow-sm'}`}>
+                    <input 
+                      type="checkbox" 
+                      checked={tipoSostenimientos.includes(tipo.id)} 
+                      onChange={() => toggleSostenimiento(tipo.id)} 
+                      disabled={lockGest} 
+                      className="w-4 h-4 accent-indigo-600 disabled:cursor-not-allowed" 
+                    />
+                    <span className="text-xs font-semibold dark:text-gray-300">{tipo.label}</span>
+                  </label>
+                ))}
               </div>
             </div>
 
@@ -215,7 +234,7 @@ function Profile() {
 
         {/* TARJETA 5: OBRA SOCIAL (Se despliega automáticamente) */}
         <AnimatePresence>
-          {tipoSostenimiento === 'obra-social' && (
+          {tipoSostenimientos.includes('obra-social') && (
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
               className="md:col-span-2 bg-gradient-to-br from-indigo-50 to-white dark:from-[#1e293b] dark:to-[#0f172a] p-8 rounded-3xl border-2 border-dashed border-indigo-400"
