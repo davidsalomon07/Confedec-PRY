@@ -1,5 +1,5 @@
 // src/pages/Consultas.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -44,6 +44,27 @@ function Consultas() {
   // --- NUEVOS ESTADOS PARA MODAL Y ESTADO ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInstitution, setSelectedInstitution] = useState(null);
+
+  // --- ESTADOS PARA PAGINACIÓN ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+  const tableRef = useRef(null);
+
+  const handlePageChange = (newPage, isBottom) => {
+    setCurrentPage(newPage);
+    
+    // Solo hace el auto-scroll si el clic vino de los botones de ABAJO
+    if (isBottom) {
+      // Le damos 150ms para asegurar que React ya renderizó las 20 filas nuevas
+      setTimeout(() => {
+        const tablaAncla = document.getElementById('inicio-tabla');
+        if (tablaAncla) {
+          // El ID nativo es infalible sin importar el layout
+          tablaAncla.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0); 
@@ -156,6 +177,7 @@ function Consultas() {
             );
         }
         setFilteredData(filtered);
+        setCurrentPage(1); // Resetear a la página 1 cuando se busca
         return; 
     }
 
@@ -177,6 +199,7 @@ function Consultas() {
     }
 
     setFilteredData(filtered);
+    setCurrentPage(1); // Resetear a la página 1 cuando se usan filtros
   }, [searchTerm, data, filterLevel, filterGender, isAdminView]);
 
   // --- NUEVA LÓGICA: ACTUALIZAR ESTADO DE INSTITUCIÓN ---
@@ -198,8 +221,6 @@ function Consultas() {
                 item.amie === amie ? { ...item, estado: newEstado } : item
             );
             setData(updateList(data));
-            // updateList sobre filteredData ya se encarga el useEffect, 
-            // pero lo forzamos aquí para una UI instantánea
             setFilteredData(updateList(filteredData));
         } else {
             console.error("Error al actualizar estado en el servidor");
@@ -230,15 +251,10 @@ function Consultas() {
 
   const handleSelectAll = (e) => {
       if (e.target.checked) {
-          // Extraemos los IDs que ya están seleccionados para no duplicar
           const existingIds = new Set(selectedItems.map(item => isAdminView ? item.amie : item.curso));
-          // Filtramos solo los nuevos que vamos a añadir
           const newItems = filteredData.filter(item => !existingIds.has(isAdminView ? item.amie : item.curso));
-          
-          // Unimos los que ya tenías + los nuevos de esta búsqueda
           setSelectedItems([...selectedItems, ...newItems]);
       } else {
-          // Si desmarca la casilla, solo quitamos los que están visibles en la búsqueda actual, manteniendo los demás
           const visibleIds = new Set(filteredData.map(item => isAdminView ? item.amie : item.curso));
           setSelectedItems(selectedItems.filter(item => !visibleIds.has(isAdminView ? item.amie : item.curso)));
       }
@@ -282,7 +298,6 @@ function Consultas() {
         downloadCSV(csvContent, `estudiantes_confedec.csv`);
     }
 
-    // Limpia la selección si se solicita y si había algo seleccionado
     if (clearAfter && selectedItems.length > 0) {
         setSelectedItems([]);
     }
@@ -350,27 +365,22 @@ function Consultas() {
 
     doc.save(`reporte_confedec_${new Date().toISOString().split('T')[0]}.pdf`);
 
-    // Limpia la selección si se solicita y si había algo seleccionado
     if (clearAfter && selectedItems.length > 0) {
         setSelectedItems([]);
     }
   };
 
-  // --- NUEVA FUNCIÓN: DESCARGAR AMBOS ---
   const exportBoth = () => {
-      // Llamamos a ambas funciones pero les decimos que NO limpien la selección aún (false)
       exportToCSV(false);
       exportToPDF(false);
       
-      // Limpiamos la selección manualmente al final
       setTimeout(() => {
         if (selectedItems.length > 0) {
             setSelectedItems([]);
         }
-      }, 500); // Pequeño retraso para asegurar que ambas descargas inicien
+      }, 500); 
   };
 
-  // --- EXPORTACIÓN INDIVIDUAL (FICHA TÉCNICA) ---
   const exportSingleToCSV = () => {
     if (!selectedInstitution) return;
     
@@ -437,6 +447,12 @@ function Consultas() {
     doc.save(`Ficha_${selectedInstitution.amie}.pdf`);
   };
 
+  // --- CÁLCULOS PARA PAGINACIÓN DE LA TABLA ---
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
   const COLORS = [
     '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899',
     '#f43f5e', '#f97316', '#f59e0b', '#eab308', '#84cc16'
@@ -444,6 +460,67 @@ function Consultas() {
 
   const labelStyle = "text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 mb-1.5 flex items-center gap-2";
   const inputClass = "w-full px-4 py-2.5 rounded-xl border text-sm transition-all duration-300 flex items-center justify-between bg-white dark:bg-gray-800 border-indigo-500 dark:border-indigo-400 text-gray-900 dark:text-white shadow-lg shadow-indigo-500/10 outline-none";
+
+  const renderPagination = (isBottom = false) => {
+    if (totalPages <= 1) return null;
+    return (
+      <div className={`flex flex-col md:flex-row items-center justify-between px-8 py-6 bg-gray-50 dark:bg-[#0f172a] gap-4 ${isBottom ? 'border-t border-gray-100 dark:border-gray-800' : 'border-b border-gray-100 dark:border-gray-800 rounded-t-[3rem]'}`}>
+        <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+          Mostrando <span className="text-indigo-600 dark:text-indigo-400">{indexOfFirstItem + 1}</span> a <span className="text-indigo-600 dark:text-indigo-400">{Math.min(indexOfLastItem, filteredData.length)}</span> de <span className="text-indigo-600 dark:text-indigo-400">{filteredData.length}</span>
+        </p>
+        
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => handlePageChange(Math.max(currentPage - 1, 1), isBottom)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-[#1e293b] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-indigo-500 shadow-sm"
+          >
+            Anterior
+          </button>
+          
+          <div className="flex gap-1 px-2 hidden sm:flex">
+            {(() => {
+              const pages = [];
+              if (totalPages <= 7) {
+                for (let i = 1; i <= totalPages; i++) pages.push(i);
+              } else {
+                if (currentPage <= 4) {
+                  pages.push(1, 2, 3, 4, 5, '...', totalPages);
+                } else if (currentPage >= totalPages - 3) {
+                  pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+                } else {
+                  pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+                }
+              }
+
+              return pages.map((page, index) => {
+                if (page === '...') {
+                  return <span key={`ellipsis-${index}`} className="w-9 h-9 flex items-center justify-center text-gray-400 dark:text-gray-600 font-bold tracking-widest">...</span>;
+                }
+                return (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page, isBottom)}
+                    className={`w-9 h-9 rounded-xl text-xs font-black transition-all flex items-center justify-center ${currentPage === page ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30 border border-indigo-600' : 'bg-white dark:bg-[#1e293b] text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-indigo-500 shadow-sm'}`}
+                  >
+                    {page}
+                  </button>
+                );
+              });
+            })()}
+          </div>
+
+          <button 
+            onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages), isBottom)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-[#1e293b] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-indigo-500 shadow-sm"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <motion.div 
@@ -621,15 +698,18 @@ function Consultas() {
           {/* VISTA TABLA */}
           {(isAdminView || viewMode === 'table') ? (
             <motion.div 
+              id="inicio-tabla"
               key="table-view" 
               initial={{ opacity: 0, y: 20 }} 
               animate={{ opacity: 1, y: 0 }} 
               exit={{ opacity: 0, y: -20 }} 
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="bg-white dark:bg-[#1e293b] rounded-[3rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden"
+              className="bg-white dark:bg-[#1e293b] rounded-[3rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden scroll-mt-8"
             >
+              {/* Paginación Superior */}
+              {renderPagination(false)}
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full text-left border-collapse table-fixed">
                   <thead>
                     <tr className="bg-gray-50 dark:bg-[#0f172a] border-b border-gray-100 dark:border-gray-800">
                       <th className="px-8 py-6 text-center w-20">
@@ -650,26 +730,26 @@ function Consultas() {
                       
                       {isAdminView ? (
                           <>
-                              <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">AMIE</th>
+                              <th className="px-6 py-6 w-28 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">AMIE</th>
                               <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Nombre Institución</th>
-                              <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Provincia</th>
-                              {/* NUEVAS COLUMNAS */}
-                              <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Cantón</th>
-                              <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">Estado</th>
-                              <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">Acciones</th>
+                              <th className="px-6 py-6 w-32 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Provincia</th>
+                              <th className="px-6 py-6 w-60 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Cantón</th>
+                              <th className="px-6 py-6 w-24 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">Estado</th>
+                              <th className="px-6 py-6 w-28 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">Acciones</th>
                           </>
                       ) : (
                           <>
                               <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Curso</th>
-                              <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Nivel</th>
-                              <th className="px-6 py-6 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Estudiantes</th>
-                              <th className="px-6 py-6 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Porcentaje</th>
+                              <th className="px-6 py-6 w-32 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Nivel</th>
+                              <th className="px-6 py-6 w-32 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Estudiantes</th>
+                              <th className="px-6 py-6 w-40 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Porcentaje</th>
                           </>
                       )}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
-                    {filteredData.map((item, index) => {
+                    {/* IMPORTANTE: AQUÍ AHORA USAMOS currentItems PARA LA PAGINACIÓN */}
+                    {currentItems.map((item, index) => {
                       const isSelected = selectedItems.some(selected => 
                           isAdminView ? selected.amie === item.amie : selected.curso === item.curso
                       );
@@ -770,6 +850,9 @@ function Consultas() {
                   )}
                 </table>
               </div>
+
+              {/* Paginación Inferior */}
+              {renderPagination(true)}
             </motion.div>
           ) : (
             /* VISTA DE GRÁFICOS */
