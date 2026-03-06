@@ -61,6 +61,7 @@ function Profile() {
   const [lockGest, setLockGest] = useState(true);
   const [lockHist, setLockHist] = useState(true);
   const [lockOfer, setLockOfer] = useState(true); // Oferta abierta para checks
+  const [lockObra, setLockObra] = useState(true);
   const [showToast, setShowToast] = useState(false);
 
   // Función para manejar el marcado/desmarcado de checkboxes
@@ -73,8 +74,8 @@ function Profile() {
   const handleUpdate = () => {
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
-    // Volvemos a bloquear todas las tarjetas, incluyendo la oferta
-    setLockId(true); setLockGest(true); setLockHist(true); setLockOfer(true);
+    // Volvemos a bloquear todas las tarjetas, incluyendo la de obra social
+    setLockId(true); setLockGest(true); setLockHist(true); setLockOfer(true); setLockObra(true);
   };
 
   const inputClass = (locked) => `
@@ -237,8 +238,16 @@ function Profile() {
           {tipoSostenimientos.includes('obra-social') && (
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="md:col-span-2 bg-gradient-to-br from-indigo-50 to-white dark:from-[#1e293b] dark:to-[#0f172a] p-8 rounded-3xl border-2 border-dashed border-indigo-400"
+              className="md:col-span-2 bg-gradient-to-br from-indigo-50 to-white dark:from-[#1e293b] dark:to-[#0f172a] p-8 rounded-3xl border-2 border-dashed border-indigo-400 relative"
             >
+              {/* BOTÓN CANDADO OBRA SOCIAL */}
+              <button 
+                onClick={() => setLockObra(!lockObra)} 
+                className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/50 dark:hover:bg-gray-800 transition-colors z-10"
+              >
+                {lockObra ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500" />}
+              </button>
+
               <div className="flex items-center gap-4 mb-8">
                 <div className="p-3 bg-indigo-600 rounded-xl text-white shadow-lg"><HandHelping size={24}/></div>
                 <h3 className="font-black text-indigo-600 dark:text-indigo-400 tracking-wide uppercase">Detalle de Obra Social</h3>
@@ -246,14 +255,14 @@ function Profile() {
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <label className={labelStyle}>Tipo de Obra</label>
-                  <div className={inputClass(lockGest)}>
-                    <input type="text" className="bg-transparent outline-none w-full dark:text-white" value={tipoObraSocial} onChange={(e) => setTipoObraSocial(e.target.value)} disabled={lockGest} />
+                  <div className={inputClass(lockObra)}>
+                    <input type="text" className="bg-transparent outline-none w-full dark:text-white" value={tipoObraSocial} onChange={(e) => setTipoObraSocial(e.target.value)} disabled={lockObra} />
                   </div>
                 </div>
                 <div>
                   <label className={labelStyle}>Breve Reseña de la Obra</label>
-                  <div className={inputClass(lockGest)}>
-                    <textarea className="bg-transparent outline-none w-full p-1 text-sm dark:text-white" value={descripcionObra} onChange={(e) => setDescripcionObra(e.target.value)} disabled={lockGest} rows="2" />
+                  <div className={inputClass(lockObra)}>
+                    <textarea className="bg-transparent outline-none w-full p-1 text-sm dark:text-white" value={descripcionObra} onChange={(e) => setDescripcionObra(e.target.value)} disabled={lockObra} rows="2" />
                   </div>
                 </div>
               </div>
@@ -264,7 +273,7 @@ function Profile() {
 
       {/* BOTÓN GUARDAR DINÁMICO */}
       <AnimatePresence>
-        {(!lockId || !lockGest || !lockHist || !lockOfer) && (
+        {(!lockId || !lockGest || !lockHist || !lockOfer || !lockObra) && (
           <motion.div 
             initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
             className="fixed bottom-10 left-0 right-0 z-50 flex justify-center px-4"
