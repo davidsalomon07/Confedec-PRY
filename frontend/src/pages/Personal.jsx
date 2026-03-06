@@ -11,7 +11,8 @@ import {
   Building,
   Users,
   Save,
-  Calculator
+  Calculator,
+  CheckCircle2
 } from 'lucide-react';
 
 function Personal() {
@@ -49,8 +50,12 @@ function Personal() {
     });
   };
 
+  // Estado para la notificación elegante
+  const [showToast, setShowToast] = useState(false);
+
   const handleGuardar = () => {
-    alert('¡Información del personal actualizada correctamente!');
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
     setLockParticular(true);
     setLockFiscal(true);
   };
@@ -213,6 +218,26 @@ function Personal() {
             >
               <Save size={20} /> GUARDAR NÓMINA DE PERSONAL
             </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- NOTIFICACIÓN TOAST ELEGANTE --- */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            exit={{ opacity: 0, x: 50, transition: { duration: 0.2 } }}
+            className="fixed top-24 right-8 z-[100] flex items-center gap-4 bg-white dark:bg-[#1e293b] px-6 py-4 rounded-2xl shadow-2xl shadow-emerald-500/20 border border-emerald-100 dark:border-emerald-500/30"
+          >
+            <div className="bg-emerald-100 dark:bg-emerald-500/20 p-2 rounded-full">
+              <CheckCircle2 size={24} className="text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-gray-800 dark:text-white uppercase tracking-wider">¡Éxito!</p>
+              <p className="text-xs font-bold text-gray-500 dark:text-gray-400">Información de personal actualizada.</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
