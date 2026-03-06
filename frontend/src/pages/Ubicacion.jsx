@@ -111,10 +111,10 @@ function Ubicacion() {
             <div>
               <label className={labelStyle}>Zona Administrativa</label>
               <div className={inputClass(lockZona)}>
-                <select className="bg-transparent outline-none w-full text-sm disabled:cursor-default" disabled={lockZona} value={zona} onChange={(e) => setZona(e.target.value)}>
-                  <option value="">- Seleccionar Zona -</option>
+                <select className="bg-transparent outline-none w-full text-sm disabled:cursor-default dark:text-white" disabled={lockZona} value={zona} onChange={(e) => setZona(e.target.value)}>
+                  <option value="" className="dark:bg-[#1e293b] text-gray-900 dark:text-white">- Seleccionar Zona -</option>
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
-                    <option key={n} value={n}>Zona {n}</option>
+                    <option key={n} value={n} className="dark:bg-[#1e293b] text-gray-900 dark:text-white">Zona {n}</option>
                   ))}
                 </select>
               </div>
@@ -122,9 +122,9 @@ function Ubicacion() {
             <div>
               <label className={labelStyle}>Régimen Escolar</label>
               <div className={inputClass(lockZona)}>
-                <select className="bg-transparent outline-none w-full text-sm" disabled={lockZona}>
-                  <option value="sierra">Sierra / Amazonía</option>
-                  <option value="costa">Costa / Galápagos</option>
+                <select className="bg-transparent outline-none w-full text-sm dark:text-white" disabled={lockZona}>
+                  <option value="sierra" className="dark:bg-[#1e293b] text-gray-900 dark:text-white">Sierra / Amazonía</option>
+                  <option value="costa" className="dark:bg-[#1e293b] text-gray-900 dark:text-white">Costa / Galápagos</option>
                 </select>
               </div>
             </div>
@@ -146,10 +146,10 @@ function Ubicacion() {
             <div>
               <label className={labelStyle}>Provincia</label>
               <div className={inputClass(lockPolitica)}>
-                <select className="bg-transparent outline-none w-full text-sm" disabled={lockPolitica} value={provincia} onChange={handleProvinciaChange}>
-                  <option value="">- Seleccionar Provincia -</option>
+                <select className="bg-transparent outline-none w-full text-sm dark:text-white" disabled={lockPolitica} value={provincia} onChange={handleProvinciaChange}>
+                  <option value="" className="dark:bg-[#1e293b] text-gray-900 dark:text-white">- Seleccionar Provincia -</option>
                   {Object.keys(ecuadorData).map(p => (
-                    <option key={p} value={p}>{p}</option>
+                    <option key={p} value={p} className="dark:bg-[#1e293b] text-gray-900 dark:text-white">{p}</option>
                   ))}
                 </select>
               </div>
@@ -157,10 +157,10 @@ function Ubicacion() {
             <div>
               <label className={labelStyle}>Cantón</label>
               <div className={inputClass(lockPolitica)}>
-                <select className="bg-transparent outline-none w-full text-sm" disabled={lockPolitica || !provincia} value={canton} onChange={(e) => setCanton(e.target.value)}>
-                  <option value="">- Seleccionar Cantón -</option>
+                <select className="bg-transparent outline-none w-full text-sm dark:text-white" disabled={lockPolitica || !provincia} value={canton} onChange={(e) => setCanton(e.target.value)}>
+                  <option value="" className="dark:bg-[#1e293b] text-gray-900 dark:text-white">- Seleccionar Cantón -</option>
                   {provincia && ecuadorData[provincia].map(c => (
-                    <option key={c} value={c}>{c}</option>
+                    <option key={c} value={c} className="dark:bg-[#1e293b] text-gray-900 dark:text-white">{c}</option>
                   ))}
                 </select>
               </div>
