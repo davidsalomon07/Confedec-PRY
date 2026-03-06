@@ -8,7 +8,8 @@ import {
   Lock, 
   Unlock, 
   Globe,
-  Navigation
+  Navigation,
+  CheckCircle2
 } from 'lucide-react';
 
 // DATOS DE ECUADOR (Mantenidos intactos para tu funcionalidad)
@@ -39,26 +40,123 @@ const ecuadorData = {
   "Santa Elena": ["Santa Elena", "La Libertad", "Salinas"]
 };
 
+// --- LÓGICA RELACIONAL ---
+const zonasData = {
+  "1": ["Esmeraldas", "Imbabura", "Carchi", "Sucumbíos"],
+  "2": ["Pichincha", "Napo", "Orellana"], // Excluye Quito
+  "3": ["Cotopaxi", "Tungurahua", "Chimborazo", "Pastaza"],
+  "4": ["Manabí", "Santo Domingo de los Tsáchilas"],
+  "5": ["Santa Elena", "Guayas", "Los Ríos", "Bolívar", "Galápagos"], // Excluye GYE, Samborondón, Durán
+  "6": ["Azuay", "Cañar", "Morona Santiago"],
+  "7": ["Loja", "El Oro", "Zamora Chinchipe"],
+  "8": ["Guayas"], // SOLO Guayaquil, Samborondón, Durán
+  "9": ["Pichincha"] // SOLO Quito
+};
+
+const cantonesZona8 = ["Guayaquil", "Samborondón", "Durán"];
+const cantonesZona9 = ["Quito"];
+
+const provinciasCosta = [
+  "Esmeraldas", "Manabí", "Santa Elena", "Guayas", 
+  "Los Ríos", "El Oro", "Galápagos", "Santo Domingo de los Tsáchilas"
+];
+
 function Ubicacion() {
   // 1. Scroll al inicio
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   // Form States
+  const [zona, setZona] = useState("");
+  const [regimen, setRegimen] = useState("");
   const [provincia, setProvincia] = useState("");
   const [canton, setCanton] = useState("");
-  const [zona, setZona] = useState("");
-  const [distrito, setDistrito] = useState("17D05");
-  const [ciudad, setCiudad] = useState("Quito");
-  const [gmaps, setGmaps] = useState("https://goo.gl/maps/example");
+  const [distrito, setDistrito] = useState("");
+  const [ciudad, setCiudad] = useState("");
+  const [gmaps, setGmaps] = useState("");
+
+  // Listas Dinámicas
+  const [provinciasDisponibles, setProvinciasDisponibles] = useState(Object.keys(ecuadorData));
+  const [cantonesDisponibles, setCantonesDisponibles] = useState([]);
 
   // ESTADOS DE BLOQUEO INDIVIDUAL
   const [lockZona, setLockZona] = useState(true);
   const [lockPolitica, setLockPolitica] = useState(true);
   const [lockExacta, setLockExacta] = useState(true);
   const [lockJornada, setLockJornada] = useState(true);
+  const [showToast, setShowToast] = useState(false);
+
+  // LÓGICA 1: Cuando el usuario cambia la ZONA
+  useEffect(() => {
+    if (!zona) {
+      setProvinciasDisponibles(Object.keys(ecuadorData));
+      setProvincia("");
+      setCanton("");
+      setCantonesDisponibles([]);
+      setRegimen("");
+      return;
+    }
+
+    const provsZona = zonasData[zona] || [];
+    setProvinciasDisponibles(provsZona);
+
+    // Automatizaciones estrictas para Zonas Especiales
+    if (zona === "8") {
+      setProvincia("Guayas");
+      setCantonesDisponibles(cantonesZona8);
+      setCanton("");
+      setRegimen("costa");
+    } else if (zona === "9") {
+      setProvincia("Pichincha");
+      setCantonesDisponibles(cantonesZona9);
+      setCanton("Quito");
+      setRegimen("sierra");
+    } else {
+      // Al cambiar a cualquier zona del 1 al 7, limpiamos todo obligatoriamente
+      setProvincia("");
+      setCanton("");
+      setCantonesDisponibles([]);
+      setRegimen("");
+    }
+  }, [zona]);
+
+  // LÓGICA 2: Cuando el usuario cambia la PROVINCIA
+  useEffect(() => {
+    if (!provincia) {
+      setCantonesDisponibles([]);
+      if (zona !== "8" && zona !== "9") setRegimen("");
+      return;
+    }
+
+    // 1. Asignar Régimen Automáticamente
+    setRegimen(provinciasCosta.includes(provincia) ? "costa" : "sierra");
+
+    // 2. Filtrar Cantones (Las excepciones de Guayas y Pichincha)
+    let cantones = ecuadorData[provincia] || [];
+    
+    if (zona === "5" && provincia === "Guayas") {
+      cantones = cantones.filter(c => !cantonesZona8.includes(c)); // Quita GYE, Samborondón, Durán
+    } else if (zona === "2" && provincia === "Pichincha") {
+      cantones = cantones.filter(c => !cantonesZona9.includes(c)); // Quita Quito
+    } else if (zona === "8") {
+      cantones = cantonesZona8;
+    } else if (zona === "9") {
+      cantones = cantonesZona9;
+    }
+
+    setCantonesDisponibles(cantones);
+    
+    // Si el cantón seleccionado ya no es válido, lo limpiamos
+    if (zona !== "9" && !cantones.includes(canton)) {
+      setCanton("");
+    }
+  }, [provincia, zona]);
 
   const handleUpdate = () => {
-    alert("¡Ubicación institucional actualizada!");
+    // Mostramos la notificación y la ocultamos tras 3 segundos
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+    
+    // Bloqueamos los candados nuevamente
     setLockZona(true); setLockPolitica(true); setLockExacta(true); setLockJornada(true);
   };
 
@@ -121,8 +219,10 @@ function Ubicacion() {
             </div>
             <div>
               <label className={labelStyle}>Régimen Escolar</label>
-              <div className={inputClass(lockZona)}>
-                <select className="bg-transparent outline-none w-full text-sm dark:text-white" disabled={lockZona}>
+              {/* Le pasamos "true" directo para que el candado visual y funcional sea permanente */}
+              <div className={inputClass(true)}>
+                <select className="bg-transparent outline-none w-full text-sm dark:text-white" disabled={true} value={regimen} onChange={() => {}}>
+                  <option value="" className="dark:bg-[#1e293b] text-gray-900 dark:text-white">- Se asignará por Provincia -</option>
                   <option value="sierra" className="dark:bg-[#1e293b] text-gray-900 dark:text-white">Sierra / Amazonía</option>
                   <option value="costa" className="dark:bg-[#1e293b] text-gray-900 dark:text-white">Costa / Galápagos</option>
                 </select>
@@ -145,10 +245,11 @@ function Ubicacion() {
           <div className="space-y-6">
             <div>
               <label className={labelStyle}>Provincia</label>
-              <div className={inputClass(lockPolitica)}>
-                <select className="bg-transparent outline-none w-full text-sm dark:text-white" disabled={lockPolitica} value={provincia} onChange={handleProvinciaChange}>
+              {/* Se bloquea automáticamente si es Zona 8 o 9 */}
+              <div className={inputClass(lockPolitica || zona === "8" || zona === "9")}>
+                <select className="bg-transparent outline-none w-full text-sm dark:text-white" disabled={lockPolitica || zona === "8" || zona === "9"} value={provincia} onChange={(e) => setProvincia(e.target.value)}>
                   <option value="" className="dark:bg-[#1e293b] text-gray-900 dark:text-white">- Seleccionar Provincia -</option>
-                  {Object.keys(ecuadorData).map(p => (
+                  {provinciasDisponibles.map(p => (
                     <option key={p} value={p} className="dark:bg-[#1e293b] text-gray-900 dark:text-white">{p}</option>
                   ))}
                 </select>
@@ -156,10 +257,11 @@ function Ubicacion() {
             </div>
             <div>
               <label className={labelStyle}>Cantón</label>
-              <div className={inputClass(lockPolitica)}>
-                <select className="bg-transparent outline-none w-full text-sm dark:text-white" disabled={lockPolitica || !provincia} value={canton} onChange={(e) => setCanton(e.target.value)}>
+              {/* Se bloquea automáticamente si es Zona 9 (Solo existe Quito) */}
+              <div className={inputClass(lockPolitica || !provincia || zona === "9")}>
+                <select className="bg-transparent outline-none w-full text-sm dark:text-white" disabled={lockPolitica || !provincia || zona === "9"} value={canton} onChange={(e) => setCanton(e.target.value)}>
                   <option value="" className="dark:bg-[#1e293b] text-gray-900 dark:text-white">- Seleccionar Cantón -</option>
-                  {provincia && ecuadorData[provincia].map(c => (
+                  {cantonesDisponibles.map(c => (
                     <option key={c} value={c} className="dark:bg-[#1e293b] text-gray-900 dark:text-white">{c}</option>
                   ))}
                 </select>
@@ -239,6 +341,26 @@ function Ubicacion() {
             >
               <Navigation size={20} className="rotate-45" /> ACTUALIZAR UBICACIÓN
             </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- NOTIFICACIÓN TOAST ELEGANTE --- */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            exit={{ opacity: 0, x: 50, transition: { duration: 0.2 } }}
+            className="fixed top-24 right-8 z-[100] flex items-center gap-4 bg-white dark:bg-[#1e293b] px-6 py-4 rounded-2xl shadow-2xl shadow-emerald-500/20 border border-emerald-100 dark:border-emerald-500/30"
+          >
+            <div className="bg-emerald-100 dark:bg-emerald-500/20 p-2 rounded-full">
+              <CheckCircle2 size={24} className="text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-gray-800 dark:text-white uppercase tracking-wider">¡Éxito!</p>
+              <p className="text-xs font-bold text-gray-500 dark:text-gray-400">Ubicación institucional actualizada.</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
