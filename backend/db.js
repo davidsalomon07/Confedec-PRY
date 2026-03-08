@@ -12,4 +12,12 @@ const pool = new Pool({
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('❌ Error de conexión:', err);
+  } else {
+    console.log('✅ ¡Conectado a Render! La base de datos está lista.');
+  }
+});
+
 module.exports = pool;
