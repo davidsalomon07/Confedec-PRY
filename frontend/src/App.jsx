@@ -5,6 +5,9 @@ import { Moon, Sun, MapPin, Phone, Mail, ExternalLink, User, Lock, ChevronDown, 
 import { useTheme } from './context/ThemeContext' // 👈 Modo Oscuro
 // import './App.css' <--- YA NO LO NECESITAMOS, LO COMENTAMOS
 
+// === URL DEL BACKEND (usa variable de entorno para local y Vercel) ===
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -31,7 +34,7 @@ function App() {
     setError(''); 
 
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch('https://confedec-backend.onrender.com/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario, password })
