@@ -676,17 +676,17 @@ function Consultas() {
             </div>
 
             {/* GRUPO DERECHA: Descargas */}
-            <div className="flex gap-2">
-              <button onClick={() => exportToCSV(true)} className="px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/30 transition-transform active:scale-95 flex items-center gap-2">
+            <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center md:justify-end mt-4 md:mt-0">
+              <button onClick={() => exportToCSV(true)} className="flex-1 md:flex-none px-4 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/30 transition-transform active:scale-95 flex items-center justify-center gap-2 text-sm md:text-base">
                 <FileSpreadsheet size={18} /> CSV
               </button>
               
-              <button onClick={() => exportToPDF(true)} className="px-5 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-2xl shadow-lg shadow-rose-500/30 transition-transform active:scale-95 flex items-center gap-2">
+              <button onClick={() => exportToPDF(true)} className="flex-1 md:flex-none px-4 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-2xl shadow-lg shadow-rose-500/30 transition-transform active:scale-95 flex items-center justify-center gap-2 text-sm md:text-base">
                 <FileText size={18} /> PDF
               </button>
               
-              {/* BOTÓN: DESCARGAR AMBOS (Ahora siempre visible) */}
-              <button onClick={exportBoth} className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transition-transform active:scale-95 flex items-center gap-2 border border-indigo-500" title="Descargar PDF y CSV a la vez">
+              {/* BOTÓN: DESCARGAR AMBOS */}
+              <button onClick={exportBoth} className="w-full md:w-auto px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transition-transform active:scale-95 flex items-center justify-center gap-2 border border-indigo-500 text-sm md:text-base" title="Descargar PDF y CSV a la vez">
                 <span className="flex items-center gap-1"><FileSpreadsheet size={16} /> + <FileText size={16} /></span> Ambos
               </button>
             </div>
@@ -723,8 +723,8 @@ function Consultas() {
             >
               {/* Paginación Superior */}
               {renderPagination(false)}
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse table-fixed">
+              <div className="overflow-x-auto w-full">
+                <table className="w-full text-left border-collapse min-w-[900px]">
                   <thead>
                     <tr className="bg-gray-50 dark:bg-[#0f172a] border-b border-gray-100 dark:border-gray-800">
                       <th className="px-8 py-6 text-center w-20">
@@ -745,12 +745,12 @@ function Consultas() {
                       
                       {isAdminView ? (
                           <>
-                              <th className="px-6 py-6 w-28 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">AMIE</th>
-                              <th className="px-6 py-6 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Nombre Institución</th>
-                              <th className="px-6 py-6 w-32 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Provincia</th>
-                              <th className="px-6 py-6 w-60 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Cantón</th>
-                              <th className="px-6 py-6 w-24 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">Estado</th>
-                              <th className="px-6 py-6 w-28 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">Acciones</th>
+                              <th className="px-4 py-5 w-24 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">AMIE</th>
+                              <th className="px-4 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Nombre Institución</th>
+                              <th className="px-4 py-5 w-28 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Provincia</th>
+                              <th className="px-4 py-5 w-48 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Cantón</th>
+                              <th className="px-4 py-5 w-24 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider text-center">Estado</th>
+                              <th className="px-4 py-5 w-28 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider text-center">Acciones</th>
                           </>
                       ) : (
                           <>
@@ -779,7 +779,9 @@ function Consultas() {
 
                       return (
                         <tr key={index} className={`${rowBgClass} transition-all duration-200 ${!isActive && isAdminView ? 'opacity-50 grayscale-[0.5]' : ''}`}>
-                           <td className="px-8 py-5 text-center">
+                           
+                           {/* Celda del Checkbox */}
+                           <td className="px-4 py-4 text-center">
                               <input 
                                   type="checkbox" 
                                   checked={isSelected}
@@ -790,22 +792,24 @@ function Consultas() {
 
                            {isAdminView ? (
                               <>
-                                  <td className="px-6 py-5 font-bold text-indigo-600 dark:text-indigo-400 text-sm">{item.amie}</td>
-                                  <td className="px-6 py-5 font-bold text-gray-800 dark:text-white text-sm">
+                                  <td className="px-4 py-4 font-bold text-indigo-600 dark:text-indigo-400 text-xs md:text-sm">{item.amie}</td>
+                                  
+                                  <td className="px-4 py-4 font-bold text-gray-800 dark:text-white text-xs md:text-sm line-clamp-2" title={item.nombreInstitucion}>
                                       {item.nombreInstitucion}
                                       {!isActive && <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Inactivo</span>}
                                   </td>
-                                  <td className="px-6 py-5 text-gray-500 dark:text-gray-400 text-sm font-medium">{item.Provincia}</td>
+                                  
+                                  <td className="px-4 py-4 text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium">{item.Provincia}</td>
                                   
                                   {/* COLUMNA CANTÓN */}
-                                  <td className="px-6 py-5">
+                                  <td className="px-4 py-4">
                                     <span className="inline-block whitespace-nowrap px-3 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50">
                                       {item.Canton || 'NO DEFINIDO'}
                                     </span>
                                   </td>
                                   
                                   {/* COLUMNA ESTADO (TOGGLE) */}
-                                  <td className="px-6 py-5 text-center">
+                                  <td className="px-4 py-4 text-center">
                                       <button
                                           onClick={(e) => { e.stopPropagation(); handleToggleEstado(item.amie, item.estado); }}
                                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${isActive ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`}
@@ -815,7 +819,7 @@ function Consultas() {
                                   </td>
 
                                   {/* COLUMNA ACCIONES */}
-                                  <td className="px-6 py-5 text-center">
+                                  <td className="px-4 py-4 text-center">
                                       <button
                                           onClick={(e) => { e.stopPropagation(); openInstitutionModal(item); }}
                                           className="p-2 bg-indigo-50 dark:bg-[#0f172a] text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors border border-indigo-100 dark:border-gray-800 shadow-sm"
@@ -827,18 +831,18 @@ function Consultas() {
                               </>
                            ) : (
                               <>
-                                  <td className="px-6 py-5 font-bold text-gray-800 dark:text-white text-sm">{item.curso}</td>
-                                  <td className="px-6 py-5">
+                                  <td className="px-4 py-4 font-bold text-gray-800 dark:text-white text-xs md:text-sm">{item.curso}</td>
+                                  <td className="px-4 py-4">
                                     <span className="px-3 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
                                       {item.nivel}
                                     </span>
                                   </td>
-                                  <td className="px-6 py-5 text-center">
+                                  <td className="px-4 py-4 text-center">
                                     <span className="px-4 py-2 rounded-xl bg-indigo-50 dark:bg-[#0f172a] text-indigo-600 dark:text-indigo-400 font-black border border-indigo-100 dark:border-gray-800">
                                       {item.estudiantes}
                                     </span>
                                   </td>
-                                  <td className="px-6 py-5 text-center">
+                                  <td className="px-4 py-4 text-center">
                                     <div className="flex items-center justify-center gap-3">
                                       <div className="w-full max-w-[120px] h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner">
                                         <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500" style={{ width: `${percentage}%` }}></div>
