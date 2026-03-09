@@ -20,24 +20,20 @@ function Profile() {
   // 0. CARGA DE DATOS (Conectada a tu BD pgAdmin)
   useEffect(() => { 
     window.scrollTo(0, 0); 
-    // Cambiamos 'user_data' por 'user', que es como lo guarda tu Login
     const savedData = localStorage.getItem('user'); 
     
     if (savedData) {
       const user = JSON.parse(savedData);
       
-      // Mapeo exacto con las variables que envía el backend
       if (user.amie) setAmie(user.amie); 
-      if (user.nombreInstitucion) setNombreInst(user.nombreInstitucion); // I mayúscula
+      if (user.nombreInstitucion) setNombreInst(user.nombreInstitucion); 
       if (user.Sostenimiento) {
-        // Convierte el dato de la BD a un arreglo, separando por comas si es necesario
         const arraySost = Array.isArray(user.Sostenimiento) 
           ? user.Sostenimiento.map(s => s.toLowerCase())
           : user.Sostenimiento.toLowerCase().split(',').map(s => s.trim());
         setTipoSostenimientos(arraySost);
       }
       
-      // Mapeo de fecha si existe, si no, lo dejamos en blanco
       if (user.fechaCreacion) setFechaCreacion(user.fechaCreacion);
       
       if (user.nombreInstitucion) {
@@ -60,7 +56,7 @@ function Profile() {
   const [lockId, setLockId] = useState(true);
   const [lockGest, setLockGest] = useState(true);
   const [lockHist, setLockHist] = useState(true);
-  const [lockOfer, setLockOfer] = useState(true); // Oferta abierta para checks
+  const [lockOfer, setLockOfer] = useState(true); 
   const [lockObra, setLockObra] = useState(true);
   const [showToast, setShowToast] = useState(false);
 
@@ -74,7 +70,6 @@ function Profile() {
   const handleUpdate = () => {
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
-    // Volvemos a bloquear todas las tarjetas, incluyendo la de obra social
     setLockId(true); setLockGest(true); setLockHist(true); setLockOfer(true); setLockObra(true);
   };
 
@@ -93,11 +88,11 @@ function Profile() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-6xl mx-auto pb-20 px-4"
     >
-      {/* --- SALUDO DE BIENVENIDA CON NOMBRE REAL DE BD --- */}
+      {/* --- SALUDO DE BIENVENIDA --- */}
       <div className="mb-10 text-center md:text-left">
         <p className="text-indigo-500 font-bold tracking-[0.3em] text-xs mb-2 uppercase">Sistema de Gestión Institucional</p>
         <h1 className="text-3xl md:text-5xl font-black dark:text-white">
-          ¡Bienvenido, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">{nombreInst || "Cargando..."}</span>!
+          ¡Bienvenido, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-50 to-purple-600">{nombreInst || "Cargando..."}</span>!
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mt-2 font-medium">Panel de control administrativo - CONFEDEC</p>
       </div>
@@ -141,7 +136,7 @@ function Profile() {
           </div>
         </div>
 
-        {/* TARJETA 2: GESTIÓN (TIPO DE SOSTENIBILIDAD) */}
+        {/* TARJETA 2: GESTIÓN */}
         <div className="bg-white dark:bg-[#1e293b] p-6 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 relative">
           <button onClick={() => setLockGest(!lockGest)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-10">
             {lockGest ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500" />}
@@ -191,56 +186,15 @@ function Profile() {
           </div>
         </div>
 
-        {/* TARJETA 3: HISTORIA */}
-        <div className="md:col-span-2 bg-white dark:bg-[#1e293b] p-6 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 relative">
-          <button onClick={() => setLockHist(!lockHist)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-10">
-            {lockHist ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500" />}
-          </button>
-
-          <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl text-indigo-600 dark:text-indigo-400"><Book size={24}/></div>
-            <h3 className="font-black text-gray-800 dark:text-white tracking-wide uppercase italic">Reseña Histórica</h3>
-          </div>
-          <div className={inputClass(lockHist)}>
-            <textarea 
-              className="bg-transparent outline-none w-full p-2 text-sm leading-relaxed dark:text-white" 
-              value={historia} 
-              onChange={(e) => setHistoria(e.target.value)} 
-              disabled={lockHist} 
-              rows="4"
-              style={{ resize: 'none' }}
-            />
-          </div>
-        </div>
-
-        {/* TARJETA 4: OFERTA ACADÉMICA (Habilitada para checks) */}
-        <div className="md:col-span-2 bg-white dark:bg-[#1e293b] p-8 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 relative">
-          <button onClick={() => setLockOfer(!lockOfer)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-10">
-            {lockOfer ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500" />}
-          </button>
-
-          <div className="flex items-center gap-4 mb-8">
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl text-indigo-600 dark:text-indigo-400"><GraduationCap size={24}/></div>
-            <h3 className="font-black text-gray-800 dark:text-white tracking-wide uppercase italic">Oferta Académica</h3>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {['Inicial', 'Preparatoria', 'Básica Elemental', 'Básica Media', 'Básica Superior', 'Bachillerato'].map((item) => (
-              <label key={item} className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${lockOfer ? 'bg-gray-50 dark:bg-[#0f172a] border-gray-100 dark:border-gray-800 opacity-60' : 'hover:border-indigo-500 cursor-pointer bg-white dark:bg-gray-800 shadow-sm'}`}>
-                <input type="checkbox" defaultChecked disabled={lockOfer} className="w-5 h-5 accent-indigo-600 disabled:cursor-not-allowed" />
-                <span className="text-sm font-semibold dark:text-gray-300">{item}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* TARJETA 5: OBRA SOCIAL (Se despliega automáticamente) */}
+        {/* 🚀 NUEVA POSICIÓN: TARJETA 3 - OBRA SOCIAL (Aparece aquí si se marca en Gestión) */}
         <AnimatePresence>
           {tipoSostenimientos.includes('obra-social') && (
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.95 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              exit={{ opacity: 0, scale: 0.95 }}
               className="md:col-span-2 bg-gradient-to-br from-indigo-50 to-white dark:from-[#1e293b] dark:to-[#0f172a] p-8 rounded-3xl border-2 border-dashed border-indigo-400 relative"
             >
-              {/* BOTÓN CANDADO OBRA SOCIAL */}
               <button 
                 onClick={() => setLockObra(!lockObra)} 
                 className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/50 dark:hover:bg-gray-800 transition-colors z-10"
@@ -269,6 +223,48 @@ function Profile() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* TARJETA 4: HISTORIA (Ahora baja automáticamente) */}
+        <div className="md:col-span-2 bg-white dark:bg-[#1e293b] p-6 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 relative">
+          <button onClick={() => setLockHist(!lockHist)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-10">
+            {lockHist ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500" />}
+          </button>
+
+          <div className="flex items-center gap-4 mb-6">
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl text-indigo-600 dark:text-indigo-400"><Book size={24}/></div>
+            <h3 className="font-black text-gray-800 dark:text-white tracking-wide uppercase italic">Reseña Histórica</h3>
+          </div>
+          <div className={inputClass(lockHist)}>
+            <textarea 
+              className="bg-transparent outline-none w-full p-2 text-sm leading-relaxed dark:text-white" 
+              value={historia} 
+              onChange={(e) => setHistoria(e.target.value)} 
+              disabled={lockHist} 
+              rows="4"
+              style={{ resize: 'none' }}
+            />
+          </div>
+        </div>
+
+        {/* TARJETA 5: OFERTA ACADÉMICA */}
+        <div className="md:col-span-2 bg-white dark:bg-[#1e293b] p-8 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 relative">
+          <button onClick={() => setLockOfer(!lockOfer)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-10">
+            {lockOfer ? <Lock size={18} className="text-gray-400" /> : <Unlock size={18} className="text-indigo-500" />}
+          </button>
+
+          <div className="flex items-center gap-4 mb-8">
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl text-indigo-600 dark:text-indigo-400"><GraduationCap size={24}/></div>
+            <h3 className="font-black text-gray-800 dark:text-white tracking-wide uppercase italic">Oferta Académica</h3>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {['Inicial', 'Preparatoria', 'Básica Elemental', 'Básica Media', 'Básica Superior', 'Bachillerato'].map((item) => (
+              <label key={item} className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${lockOfer ? 'bg-gray-50 dark:bg-[#0f172a] border-gray-100 dark:border-gray-800 opacity-60' : 'hover:border-indigo-500 cursor-pointer bg-white dark:bg-gray-800 shadow-sm'}`}>
+                <input type="checkbox" defaultChecked disabled={lockOfer} className="w-5 h-5 accent-indigo-600 disabled:cursor-not-allowed" />
+                <span className="text-sm font-semibold dark:text-gray-300">{item}</span>
+              </label>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* BOTÓN GUARDAR DINÁMICO */}
@@ -288,7 +284,7 @@ function Profile() {
         )}
       </AnimatePresence>
 
-      {/* --- NOTIFICACIÓN TOAST ELEGANTE --- */}
+      {/* NOTIFICACIÓN TOAST */}
       <AnimatePresence>
         {showToast && (
           <motion.div 
