@@ -23,6 +23,8 @@ const obtenerProvincia = (amie) => {
   return CODIGOS_PROVINCIA[codigo] || 'OTRO';
 };
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 function Consultas() {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -89,13 +91,15 @@ function Consultas() {
   }, []);
 
   const cargarDatosAdministrativos = (role, scope) => {
-      let url = 'http://localhost:5000/instituciones';
+      // USAMOS LA VARIABLE DINÁMICA
+      let url = `${API_URL}/instituciones`;
       
       fetch(url)
         .then(res => res.json())
         .then(dbData => {
             let datosFinales = dbData;
 
+            // Filtro mejorado: Si el scope es "17" (Pichincha), filtra por AMIE que inicie con "17"
             if (role === 'federacion' && scope !== 'TODOS') {
                 datosFinales = dbData.filter(item => item.amie && item.amie.startsWith(scope));
             }
@@ -104,7 +108,6 @@ function Consultas() {
                 ...item,
                 Provincia: item.Provincia || obtenerProvincia(item.amie),
                 Canton: item.Canton || 'NO DEFINIDO'
-                // NOTA: Sostenimiento, fechaCreacion, y niveles ya vienen en 'item'
             }));
 
             setData(datosConProvincia);
@@ -209,7 +212,7 @@ function Consultas() {
     const newEstado = !isCurrentlyActive;
 
     try {
-        const response = await fetch(`http://localhost:5000/instituciones/${amie}/estado`, {
+        const response = await fetch(`${API_URL}/instituciones/${amie}/estado`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ estado: newEstado })
