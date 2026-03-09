@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion' // 👈 Animaciones
-import { Moon, Sun, MapPin, Phone, Mail, ExternalLink, User, Lock, ChevronDown, Menu, Eye, EyeOff } from 'lucide-react' // 👈 Iconos
+import { Moon, Sun, MapPin, Phone, Mail, ExternalLink, User, Lock, ChevronDown, Menu, X, Eye, EyeOff } from 'lucide-react' // 👈 Iconos
 import { useTheme } from './context/ThemeContext' // 👈 Modo Oscuro
 // import './App.css' <--- YA NO LO NECESITAMOS, LO COMENTAMOS
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme(); // Hook del tema
 
@@ -110,14 +111,62 @@ function App() {
               </button>
             </div>
             
-            {/* Menú Móvil (Icono) */}
+            {/* Menú Móvil (Icono + funcionalidad) */}
             <div className="md:hidden flex items-center gap-4">
-               <button onClick={toggleTheme} className="p-2">{theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}</button>
-               <Menu className="text-gray-600 dark:text-gray-300" />
+              <button 
+                onClick={toggleTheme} 
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+              </button>
+
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-gray-600 dark:text-white"
+              >
+                {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
             </div>
           </div>
         </div>
       </header>
+
+      {/* === MENÚ MÓVIL DESPLEGABLE === */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed top-20 left-0 w-full bg-white dark:bg-[#0f172a] border-b border-gray-200 dark:border-gray-700 shadow-2xl py-6 px-6 z-50 flex flex-col gap-4">
+          <button 
+            onClick={() => { scrollToSection('informacion'); setIsMobileMenuOpen(false); }}
+            className="text-left py-3 px-4 text-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-white/10 rounded-xl transition-colors"
+          >
+            INFORMACIÓN
+          </button>
+          <button 
+            onClick={() => { scrollToSection('directivo'); setIsMobileMenuOpen(false); }}
+            className="text-left py-3 px-4 text-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-white/10 rounded-xl transition-colors"
+          >
+            DIRECTIVO
+          </button>
+          <button 
+            onClick={() => { scrollToSection('ubicacion'); setIsMobileMenuOpen(false); }}
+            className="text-left py-3 px-4 text-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-white/10 rounded-xl transition-colors"
+          >
+            UBICACIÓN
+          </button>
+
+          <div className="h-px bg-gray-200 dark:bg-gray-700 my-2"></div>
+
+          <button 
+            onClick={() => { 
+              setShowLogin(true); 
+              setError(''); 
+              setIsMobileMenuOpen(false); 
+            }}
+            className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl transition-all"
+          >
+            INICIAR SESIÓN
+          </button>
+        </div>
+      )}
 
       {/* --- HERO SECTION (GRADIENTE MODERNO) --- */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
